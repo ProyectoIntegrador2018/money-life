@@ -1,0 +1,48 @@
+# Back
+/back/env
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/front/MoneyLife/dist
+/front/MoneyLife/tmp
+/front/MoneyLife/out-tsc
+# Only exists if Bazel was run
+/front/MoneyLife/bazel-out
+
+# dependencies
+/front/MoneyLife/node_modules
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# IDEs and editors
+/front/MoneyLife/.idea
+/front/MoneyLife/.project
+/front/MoneyLife/.classpath
+/front/MoneyLife/.c9/
+*.launch
+/front/MoneyLife/.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# misc
+/front/MoneyLife/.sass-cache
+/front/MoneyLife/connect.lock
+/front/MoneyLife/coverage
+/front/MoneyLife/libpeerconnection.log
+/front/MoneyLife/npm-debug.log
+/front/MoneyLife/yarn-error.log
+/front/MoneyLife/testem.log
+/front/MoneyLife/typings
+
+# System Files
+.DS_Store
+Thumbs.db
