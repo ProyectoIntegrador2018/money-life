@@ -14,18 +14,31 @@ class Afecta(models.Model):
 class User(models.Model):
     RolUsuario = models.CharField(max_length=30)
 
+#Crear tabla tipo de evento
+class Tipo_Evento(models.Model):
+    Descripcion = models.CharField(max_length=30)
+
+#Crear tabla de tipo de prestamo
+class Tipo_Prestamo(models.Model):
+    Descripcion = models.CharField(max_length=30)
+
+#Crear la tabla tipo de pregunta:
+class Tipo_Pregunta(models.Model):
+     Descripcion = models.CharField(max_length=30)
+
+
 #Crear la tabla EVENTO y sus relaciones
 #---------------------------------------------------------------
 
 #Crear tabla evento
 class Evento(models.Model):
-    TipoEvento = models.CharField(max_length=30)
     Descripcion = models.CharField(max_length=200)
     Frecuencia = models.IntegerField()
     Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Evento_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Evento_Afecta') #Relacion con Afecta
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
+    TipoEvento = models.ForeignKey(Tipo_Evento, on_delete = models.CASCADE)
     
 
 #Tabla relacion con Requisitos
@@ -53,12 +66,12 @@ class Evento_Afecta(models.Model):
 
 #Crear tabla Prestamo
 class Prestamo(models.Model):
-    TipoPrestamo = models.CharField(max_length=30)
     Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Intereses = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Prestamo_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Prestamo_Afect') #Relacion con Afecta
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
+    TipoPrestamo = models.ForeignKey(Tipo_Prestamo,on_delete=models.CASCADE)
 
 #Tabla relacion con Requisitos
 class Prestamo_Requisitos(models.Model):
@@ -85,12 +98,12 @@ class Prestamo_Afect(models.Model):
 
 #Crear tabla Preguntas
 class Preguntas(models.Model):
-    TipoPregunta = models.CharField(max_length=30)
     Descripcion = models.CharField(max_length=200)
     Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
+    TipoPregunta = models.ForeignKey(Tipo_Pregunta,on_delete=models.CASCADE)
 
 class Preguntas_Requisitos(models.Model):
     Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
