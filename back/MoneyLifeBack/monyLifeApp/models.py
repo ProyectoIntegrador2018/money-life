@@ -24,27 +24,27 @@ class Evento(models.Model):
     Frecuencia = models.IntegerField()
     Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Evento_Requisitos') #Relacion con Requisitos
-    Afecta = models.ManyToManyField(Afecta, through='Evento_Afect') #Relacion con Afecta
-    User = models.ForeignKey(User, on_delete = models.CASCADE) #Relacion con User
+    Afecta = models.ManyToManyField(Afecta, through='Evento_Afecta') #Relacion con Afecta
+    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
     
 
 #Tabla relacion con Requisitos
 class Evento_Requisitos(models.Model):
-    id_Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
-    id_Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
+    Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Requisito','id_Evento']]
+        unique_together = [['Requisito','Evento']]
 
 #Tabla relacion con Afecta
-class Evento_Afect(models.Model):
-    id_Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
-    id_Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+class Evento_Afecta(models.Model):
+    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
+    Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
     Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Afecta','id_Evento']]
+        unique_together = [['Afecta','Evento']]
 
 #---------------------------------------------------------------
 
@@ -58,25 +58,25 @@ class Prestamo(models.Model):
     Intereses = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Prestamo_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Prestamo_Afect') #Relacion con Afecta
-    User = models.ForeignKey(User, on_delete = models.CASCADE) #Relacion con User
+    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
 
 #Tabla relacion con Requisitos
 class Prestamo_Requisitos(models.Model):
-    id_Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
-    id_Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
+    Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
+    Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
     CantidadRecurente = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Requisito','id_Prestamo']]
+        unique_together = [['Requisito','Prestamo']]
 
 #Tabla relacion con Afecta
 class Prestamo_Afect(models.Model):
-    id_Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
-    id_Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
+    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
+    Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
     Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Afecta','id_Prestamo']]
+        unique_together = [['Afecta','Prestamo']]
 
 #---------------------------------------------------------------
 
@@ -90,23 +90,23 @@ class Preguntas(models.Model):
     Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
-    User = models.ForeignKey(User, on_delete = models.CASCADE) #Relacion con User
+    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
 
 class Preguntas_Requisitos(models.Model):
-    id_Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
-    id_Preguntas = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
+    Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
+    Preguntas = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
     CantidadRecurente = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Requisito','id_Preguntas']]
+        unique_together = [['Requisito','Preguntas']]
 
 class Preguntas_Afecta(models.Model):
-    id_Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
-    id_Preguntas = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
+    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
+    Preguntas = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
     Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
 
     class Meta:
-        unique_together = [['id_Afecta','id_Preguntas']]
+        unique_together = [['Afecta','Preguntas']]
 
 #---------------------------------------------------------------
 
@@ -119,9 +119,26 @@ class Turnos(models.Model):
     Egresos = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
     Edad = models.IntegerField()
     Sexo = models.CharField(max_length=10)
-    Requisitos = models.ForeignKey(Requisitos, on_delete = models.CASCADE) #Relacion con Requisitos
-    Afecta = models.ForeignKey(Afecta, on_delete = models.CASCADE) #Relacion con Afecta
-    User = models.ForeignKey(User, on_delete = models.CASCADE) #Relacion con User
+    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
     Evento = models.ForeignKey(Evento, on_delete = models.CASCADE) #Relacion con Evento
     Prestamo = models.ForeignKey(Prestamo, on_delete = models.CASCADE) #Relacion con Prestamo
-    Preguntas = models.ForeignKey(Preguntas, on_delete = models.CASCADE)
+    Preguntas = models.ForeignKey(Preguntas, on_delete = models.CASCADE) #Relacion con Preguntas
+
+    Requisitos = models.ManyToManyField(Requisitos, through='Turnos_Requisitos') #Relacion con Requisitos
+    Afecta = models.ManyToManyField(Afecta, through='Turnos_Afecta') #Relacion con Afecta
+
+class Turnos_Requisitos(models.Model):
+    Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
+    Turnos = models.ForeignKey(Turnos, on_delete=models.CASCADE)
+    Cantidad= models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
+
+    class Meta:
+        unique_together = [['Requisito','Turnos']]
+
+class Turnos_Afecta(models.Model):
+    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
+    Turnos = models.ForeignKey(Turnos, on_delete=models.CASCADE)
+    Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=10)
+
+    class Meta:
+        unique_together = [['Afecta','Turnos']]
