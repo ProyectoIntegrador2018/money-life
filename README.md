@@ -128,7 +128,7 @@ Para validar que se haya instalado de forma corecta, puedes desplegar la varcion
 1. Python: `python --version`
 2. MySql: `mysql -v`
 
-### Documentacion
+### Documentación
 
 Para mas informacion de las herramientas utilizadas, puedes consultar las paginas oficiales de cada una de estas
 
