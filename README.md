@@ -133,16 +133,16 @@ Para validar que se haya instalado de forma corecta, puedes desplegar la varcion
 Para mas informacion de las herramientas utilizadas, puedes consultar las paginas oficiales de cada una de estas
 
 ###### Angular
-[https://angular.io/docs] (https://angular.io/docs)
+https://angular.io/docs
 
 ###### Django
-[https://docs.djangoproject.com/es/3.1/] (https://docs.djangoproject.com/es/3.1/)
+https://docs.djangoproject.com/es/3.1/
 
 ###### Python
-[https://docs.python.org/es/3/] (https://docs.python.org/es/3/)
+https://docs.python.org/es/3/
 
 ###### Mysql
-[https://dev.mysql.com/doc/] (https://dev.mysql.com/doc/)
+https://dev.mysql.com/doc/
 
 
 
