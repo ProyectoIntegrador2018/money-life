@@ -81,7 +81,7 @@ DATABASES = {
         'USER': 'moneylifeuser',
         'PASSWORD': 'moneylifeuser#',
         'HOST': 'localhost',
-        'POST': '',
+        'PORT': '',
 
     }
 }
