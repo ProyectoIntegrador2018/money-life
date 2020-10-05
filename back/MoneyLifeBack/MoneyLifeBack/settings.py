@@ -78,10 +78,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'MoneyDB',
-        'USER': 'root',
-        'PASSWORD': 'Aa123456',
+        'USER': 'moneylifeuser',
+        'PASSWORD': 'moneylifeuser#',
         'HOST': 'localhost',
-        'POST': '',
+        'PORT': '',
 
     }
 }
