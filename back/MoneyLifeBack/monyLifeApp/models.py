@@ -1,6 +1,15 @@
 from django.db import models
 
+
 # Create your models here.
+
+class Archivos(models.Model):
+    Archivo = models.FileField(upload_to='Files/')
+
+
+    class Meta:
+        verbose_name_plural = "Archivos"
+    
 
 #Crear la tabla Requisitos
 class Requisitos(models.Model):

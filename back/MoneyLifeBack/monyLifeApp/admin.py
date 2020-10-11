@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import *
 # Register your models here.
 
+
 class RequisitosAdmin(admin.ModelAdmin):
     list_display=("TipoRequisito",)
     search_fields=("TipoRequisito",)
@@ -74,6 +75,11 @@ class TipoPreguntaAdmin(admin.ModelAdmin):
     list_display=("TipoPregunta",)
     search_fields=("TipoPregunta",)
 
+class ArchivosAdmin(admin.ModelAdmin):
+    fields = ["Archivo",]
+    list_display = ("Archivo",)
+    search_fields = ("Archivo",)
+
 admin.site.register(Requisitos, RequisitosAdmin)
 admin.site.register(Afecta, AfectaAdmin)
 admin.site.register(Periodo, PeriodoAdmin)
@@ -92,6 +98,8 @@ admin.site.register(Preguntas, PreguntasAdmin)
 admin.site.register(Preguntas_Requisitos, Preguntas_RequisitosAdmin)
 admin.site.register(Preguntas_Afecta, Preguntas_AfectaAdmin)
 admin.site.register(TipoPregunta, TipoPreguntaAdmin)
+
+admin.site.register(Archivos, ArchivosAdmin)
 
 #admin.site.register(User)
 #admin.site.register(Turnos)
