@@ -104,7 +104,49 @@ class Evento_Afecta(models.Model):
         verbose_name_plural = "Evento_Afecta"
 
 #---------------------------------------------------------------
+#Crear la tabla Tipo Inversion
+class TipoInversiones(models.Model):
+    Inversion = models.CharField(max_length=40, blank=True, null=True)
+    TipoInversion = models.CharField(max_length=40,blank=True, null=True)
+    RangoRendimiento = models.CharField(max_length=40,blank=True, null=True)
 
+    class Meta:
+        verbose_name_plural = "Tipo Inversion"
+
+    def __str__(self):
+        return self.TipoInversion
+#---------------------------------------------------------------
+#Crear la tabla Ultima Instancia Inversion
+class Inversion(models.Model):
+    TipoInversion = models.ForeignKey(TipoInversiones, on_delete=models.CASCADE)
+    NombreInversion = models.CharField(max_length=40, blank=True, null=True)
+    TipoEmpresa = models.CharField(max_length=40,blank=True, null=True)
+    SaldoInicial = models.DecimalField(max_digits=20,decimal_places=2,blank=True, null=True)
+    SaldoAportacion = models.DecimalField(max_digits=20,decimal_places=2,blank=True, null=True)
+    TasaRendimiento = models.CharField(max_length=40, blank = True, null = True)
+    Aportacion = models.DecimalField(max_digits=20, decimal_places=2,blank=True, null=True)
+    SaldoActual = models.DecimalField(max_digits=20, decimal_places=2,blank=True, null=True)
+    Afecta = models.ManyToManyField(Afecta, through='Inversion_Afecta') #Relacion con Afecta
+    User = models.ForeignKey(User,blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
+
+    class Meta:
+        verbose_name_plural = "Inversion"
+
+    def __str__(self):
+        return self.NombreInversion
+
+class Inversion_Afecta(models.Model):
+    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
+    Inversion = models.ForeignKey(Inversion, on_delete=models.CASCADE)
+    Periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)
+    Cantidad = models.CharField(max_length=40, blank=True, null=True)
+    Duracion = models.IntegerField()
+
+    class Meta:
+        unique_together = [['Afecta','Inversion']]
+        verbose_name_plural = "Inversion Afecta"
+
+#---------------------------------------------------------------
 #Crear la tabla Tipo Prestamo
 class TipoPrestamo(models.Model):
     TipoPrestamo = models.CharField(max_length=30, verbose_name="Tipo Prestamo")
@@ -120,12 +162,18 @@ class TipoPrestamo(models.Model):
 
 #Crear tabla Prestamo
 class Prestamo(models.Model):
-    Cantidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
-    Intereses = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
-    Requisitos = models.ManyToManyField(Requisitos, through='Prestamo_Requisitos') #Relacion con Requisitos
-    Afecta = models.ManyToManyField(Afecta, through='Prestamo_Afect') #Relacion con Afecta
+    TipoPrestamo = models.ForeignKey(TipoPrestamo,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Prestamo") #Relacion con Prestamo
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
-    TipoPrestamo = models.ForeignKey(TipoPrestamo,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Prestamo") #Relacion con TipoEvento
+    ValorTotal = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    CantidadPrestada = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Enganche = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Amortizacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Interes = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Mensualidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    AbonoCapital = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    SaldoAbsoluto = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Afecta = models.ManyToManyField(Afecta, through='Prestamo_Afect') #Relacion con Afecta
+    
 
     class Meta:
         verbose_name_plural = "Prestamos"
@@ -133,15 +181,6 @@ class Prestamo(models.Model):
     def __str__(self):
         return str(self.Cantidad)
 
-#Tabla relacion con Requisitos
-class Prestamo_Requisitos(models.Model):
-    Requisito = models.ForeignKey(Requisitos, on_delete=models.CASCADE)
-    Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
-    Cantidad = models.CharField(max_length=40, blank=True, null=True)
-
-    class Meta:
-        unique_together = [['Requisito','Prestamo']]
-        verbose_name_plural = "Prestamo_Requisito"
 
 #Tabla relacion con Afecta
 class Prestamo_Afect(models.Model):
@@ -160,6 +199,8 @@ class Prestamo_Afect(models.Model):
 #Crear la tabla Tipo Pregunta
 class TipoPregunta(models.Model):
     TipoPregunta = models.CharField(max_length=30, verbose_name="Tipo Pregunta")
+    TasaRendimiento = models.CharField(max_length=30,verbose_name="Tasa de Rendimiento")
+    SaldoInversion = models.CharField(max_length=30,verbose_name="Saldo de Inversion")
 
     class Meta:
         verbose_name_plural = "Tipo Pregunta"
@@ -218,7 +259,6 @@ class Turnos(models.Model):
     Sexo = models.CharField(max_length=10)
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
     Evento = models.ForeignKey(Evento, on_delete = models.CASCADE) #Relacion con Evento
-    Prestamo = models.ForeignKey(Prestamo, on_delete = models.CASCADE) #Relacion con Prestamo
     Preguntas = models.ForeignKey(Preguntas, on_delete = models.CASCADE) #Relacion con Preguntas
     Requisitos = models.ManyToManyField(Requisitos, through='Turnos_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Turnos_Afecta') #Relacion con Afecta

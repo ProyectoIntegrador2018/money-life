@@ -35,26 +35,6 @@ class TipoEventoAdmin(admin.ModelAdmin):
     list_display=("TipoEvento",)
     search_fields=("TipoEvento",)
 
-class PrestamoAdmin(admin.ModelAdmin):
-    list_display=("Cantidad", "Intereses", "TipoPrestamo")
-    search_fields=("Cantidad",)
-    list_filter=("TipoPrestamo",)
-    exclude = ('User',)
-
-class Prestamo_RequisitosAdmin(admin.ModelAdmin):
-    list_display=("Prestamo", "Requisito", "Cantidad")
-    search_fields=("Prestamo__Cantidad",)
-    list_filter=("Requisito",)
-
-class Prestamo_AfectAdmin(admin.ModelAdmin):
-    list_display=("Prestamo", "Afecta", "Cantidad","Periodo", "Duracion")
-    search_fields=("Prestamo__Cantidad",)
-    list_filter=("Afecta","Periodo")
-
-class TipoPrestamoAdmin(admin.ModelAdmin):
-    list_display=("TipoPrestamo",)
-    search_fields=("TipoPrestamo",)
-
 class PreguntasAdmin(admin.ModelAdmin):
     list_display=("Descripcion", "TipoPreguntas")
     search_fields=("Descripcion",)
@@ -88,11 +68,6 @@ admin.site.register(Evento, EventoAdmin)
 admin.site.register(Evento_Requisitos, Evento_RequisitosAdmin)
 admin.site.register(Evento_Afecta, Evento_AfectaAdmin)
 admin.site.register(TipoEvento, TipoEventoAdmin)
-
-admin.site.register(Prestamo, PrestamoAdmin)
-admin.site.register(Prestamo_Requisitos, Prestamo_RequisitosAdmin)
-admin.site.register(Prestamo_Afect, Prestamo_AfectAdmin)
-admin.site.register(TipoPrestamo, TipoPrestamoAdmin)
 
 admin.site.register(Preguntas, PreguntasAdmin)
 admin.site.register(Preguntas_Requisitos, Preguntas_RequisitosAdmin)

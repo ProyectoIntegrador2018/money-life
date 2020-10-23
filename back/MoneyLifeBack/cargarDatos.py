@@ -25,7 +25,10 @@ def main(archivobd):
     cargarBase(paginas)
 
 if __name__ == "__main__":
-    folder = Path("Files/")
-    archivobd =  folder / os.listdir('Files/')[0]
-    print(archivobd)
-    main(archivobd)
+    try:
+        folder = Path("Files/")
+        archivobd =  folder / os.listdir('Files/')[0]
+        print(archivobd)
+        main(archivobd)
+    except:
+        print('error al leer el archivo')
