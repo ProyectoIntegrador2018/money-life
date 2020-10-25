@@ -1,0 +1,56 @@
+<div class="login-background">
+    <div class="content">
+        <div class="login-input">
+            <div class="login">
+                <ng-container [ngSwitch]="action">
+                    <ng-container *ngSwitchCase="'login'">
+                        <ng-container *ngTemplateOutlet="login"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'register'">
+                        <ng-container *ngTemplateOutlet="register"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #login>
+    <h1>Iniciar sesión</h1>
+    <form class="inputs" [formGroup]="logInForm" (ngSubmit)="onSubmit()">
+        <div class="input">
+            <img src="assets/user-profile.png" alt="">
+            <input type="text" name="user" (click)="errorUser = false" formControlName="user" [ngClass]="{'error': errorUser}" placeholder="Usuario"/>
+        </div>
+        
+        <div class="input">
+            <img src="assets/lock.png" alt="">
+            <input type="password" name="password" (click)="errorPass = false" formControlName="password" [ngClass]="{'error': errorPass}" placeholder="Contraseña"/>
+        </div>
+        <button class="btn-login" type="submit">Entrar</button>
+        <p (click)="action = 'register'">¿Olvidaste tu contraseña?</p>
+    </form>
+</ng-template>
+
+<ng-template #register>
+    <h1>Registro</h1>
+    <form class="inputs" [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
+        <div class="input">
+            <img src="assets/user-profile.png" alt="">
+            <input type="text" name="user" (click)="errorUserNew = false" formControlName="newUser" [ngClass]="{'error': errorUserNew}" placeholder="Usuario"/>
+        </div>
+        
+        <div class="input">
+            <img src="assets/lock.png" alt="">
+            <input type="password" name="password" (click)="errorPassNew = false" formControlName="newPassword" [ngClass]="{'error': errorPassNew}" placeholder="Contraseña"/>
+        </div>
+
+        <div class="input">
+            <img src="assets/lock.png" alt="">
+            <input type="password" name="password2" (click)="errorPassNew2 = false" formControlName="newPassword2" [ngClass]="{'error': errorPassNew2}" placeholder="Repetir contraseña"/>
+        </div>
+
+        <button class="btn-login" type="submit">Registrarse</button>
+        <p (click)="action = 'login'">Atras</p>
+    </form>
+</ng-template>
