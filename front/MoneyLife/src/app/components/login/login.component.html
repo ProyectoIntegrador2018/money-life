@@ -9,6 +9,9 @@
                     <ng-container *ngSwitchCase="'register'">
                         <ng-container *ngTemplateOutlet="register"></ng-container>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'recover'">
+                        <ng-container *ngTemplateOutlet="recover"></ng-container>
+                    </ng-container>
                 </ng-container>
             </div>
         </div>
@@ -20,7 +23,7 @@
     <form class="inputs" [formGroup]="logInForm" (ngSubmit)="onSubmit()">
         <div class="input">
             <img src="assets/user-profile.png" alt="">
-            <input type="text" name="user" (click)="errorUser = false" formControlName="user" [ngClass]="{'error': errorUser}" placeholder="Usuario"/>
+            <input type="text" name="user" (click)="errorUser = false" formControlName="user" [ngClass]="{'error': errorUser}" placeholder="Correo"/>
         </div>
         
         <div class="input">
@@ -28,7 +31,8 @@
             <input type="password" name="password" (click)="errorPass = false" formControlName="password" [ngClass]="{'error': errorPass}" placeholder="Contraseña"/>
         </div>
         <button class="btn-login" type="submit">Entrar</button>
-        <p (click)="action = 'register'">¿Olvidaste tu contraseña?</p>
+        <button class="btn-login" (click)="action = 'register'">Registrarse</button>
+        <p (click)="action = 'recover'; resetAll()">¿Olvidaste tu contraseña?</p>
     </form>
 </ng-template>
 
@@ -37,7 +41,7 @@
     <form class="inputs" [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
         <div class="input">
             <img src="assets/user-profile.png" alt="">
-            <input type="text" name="user" (click)="errorUserNew = false" formControlName="newUser" [ngClass]="{'error': errorUserNew}" placeholder="Usuario"/>
+            <input type="text" name="newUser" (click)="errorUserNew = false" formControlName="newUser" [ngClass]="{'error': errorUserNew}" placeholder="Correo"/>
         </div>
         
         <div class="input">
@@ -51,6 +55,19 @@
         </div>
 
         <button class="btn-login" type="submit">Registrarse</button>
-        <p (click)="action = 'login'">Atras</p>
+        <p (click)="action = 'login'; resetAll()">Atras</p>
+    </form>
+</ng-template>
+
+<ng-template #recover>
+    <h1>Recuperar contraseña</h1>
+    <form class="inputs" [formGroup]="recoverForm" (ngSubmit)="onSubmitRecover()">
+        <div class="input">
+            <img src="assets/email.png" alt="">
+            <input type="text" name="recoverEmail" (click)="errorRecover = false" formControlName="recoverEmail" [ngClass]="{'error': errorRecover}" placeholder="Correo"/>
+        </div>
+        
+        <button class="btn-login" type="submit">Recuperar</button>
+        <p (click)="action = 'login'; resetAll()">Atras</p>
     </form>
 </ng-template>
