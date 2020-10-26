@@ -123,10 +123,10 @@ class Inversion(models.Model):
     TipoEmpresa = models.CharField(max_length=40,blank=True, null=True)
     SaldoInicial = models.DecimalField(max_digits=20,decimal_places=2,blank=True, null=True)
     SaldoAportacion = models.DecimalField(max_digits=20,decimal_places=2,blank=True, null=True)
+    EventoExterno = models.CharField(max_length=40, blank=True, null=True)
     TasaRendimiento = models.CharField(max_length=40, blank = True, null = True)
     Aportacion = models.DecimalField(max_digits=20, decimal_places=2,blank=True, null=True)
     SaldoActual = models.DecimalField(max_digits=20, decimal_places=2,blank=True, null=True)
-    Afecta = models.ManyToManyField(Afecta, through='Inversion_Afecta') #Relacion con Afecta
     User = models.ForeignKey(User,blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
 
     class Meta:
@@ -135,34 +135,27 @@ class Inversion(models.Model):
     def __str__(self):
         return self.NombreInversion
 
-class Inversion_Afecta(models.Model):
-    Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
-    Inversion = models.ForeignKey(Inversion, on_delete=models.CASCADE)
-    Periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)
-    Cantidad = models.CharField(max_length=40, blank=True, null=True)
-    Duracion = models.IntegerField()
-
-    class Meta:
-        unique_together = [['Afecta','Inversion']]
-        verbose_name_plural = "Inversion Afecta"
-
 #---------------------------------------------------------------
 #Crear la tabla Tipo Prestamo
 class TipoPrestamo(models.Model):
+    idPrestamo = models.IntegerField()
     TipoPrestamo = models.CharField(max_length=30, verbose_name="Tipo Prestamo")
+    Duracion = models.CharField(max_length=30, verbose_name="Duración")
+    TazaInteres = models.CharField(max_length=30, verbose_name="Taza de Interes")
+    Afecta = models.ManyToManyField(Afecta, through='TipoPrestamo_Afect') #Relacion con Afecta
 
     class Meta:
         verbose_name_plural = "Tipo Prestamo"
 
     def __str__(self):
-        return self.TipoPrestamo
+        return str(self.idPrestamo)
 
 #Crear la tabla PRESTAMO y sus relaciones
 #---------------------------------------------------------------
-
+####ERRROR EN LA TABLA TIPO PRESTAMO Y CONEXIONES
 #Crear tabla Prestamo
 class Prestamo(models.Model):
-    TipoPrestamo = models.ForeignKey(TipoPrestamo,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Prestamo") #Relacion con Prestamo
+    idPrestamo = models.ForeignKey(TipoPrestamo,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Prestamo") #Relacion con Prestamo
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
     ValorTotal = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     CantidadPrestada = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
@@ -172,26 +165,25 @@ class Prestamo(models.Model):
     Mensualidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     AbonoCapital = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     SaldoAbsoluto = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
-    Afecta = models.ManyToManyField(Afecta, through='Prestamo_Afect') #Relacion con Afecta
     
 
     class Meta:
         verbose_name_plural = "Prestamos"
 
     def __str__(self):
-        return str(self.Cantidad)
+        return str(self.CantidadPrestada)
 
 
 #Tabla relacion con Afecta
-class Prestamo_Afect(models.Model):
+class TipoPrestamo_Afect(models.Model):
     Afecta = models.ForeignKey(Afecta, on_delete=models.CASCADE)
-    Prestamo = models.ForeignKey(Prestamo, on_delete=models.CASCADE)
+    TipoPrestamo = models.ForeignKey(TipoPrestamo, on_delete=models.CASCADE)
     Periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)
     Cantidad = models.CharField(max_length=40, blank=True, null=True)
     Duracion = models.IntegerField()
 
     class Meta:
-        unique_together = [['Afecta','Prestamo']]
+        unique_together = [['Afecta','TipoPrestamo']]
         verbose_name_plural = "Prestamo_Afecta"
 
 #---------------------------------------------------------------
@@ -208,6 +200,17 @@ class TipoPregunta(models.Model):
     def __str__(self):
         return self.TipoPregunta
 
+#Crear objeto pregunta
+class InversionPregunta(models.Model):
+    TipoInversion = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE)
+    SaldoInicial = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    InicialMasAportacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    EventoExterno = models.CharField(max_length=30)
+    TazaRendimiento = models.CharField(max_length=30)
+    Aportacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    SaldoActual = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    SaldoInvercion = models.CharField(max_length=30)
+
 #Crear la tabla PREGUNTAS y sus relaciones
 #---------------------------------------------------------------
 
@@ -218,7 +221,7 @@ class Preguntas(models.Model):
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
-    TipoPreguntas = models.ForeignKey(TipoPregunta,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Pregunta") #Relacion con TipoPreguntas
+    TipoPreguntas = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE, verbose_name="Tipo Pregunta") #Relacion con TipoPreguntas
 
     class Meta:
         verbose_name_plural = "Preguntas"

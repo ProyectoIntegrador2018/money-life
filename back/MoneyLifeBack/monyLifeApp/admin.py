@@ -36,7 +36,7 @@ class TipoEventoAdmin(admin.ModelAdmin):
     search_fields=("TipoEvento",)
 
 class PreguntasAdmin(admin.ModelAdmin):
-    list_display=("Descripcion", "TipoPreguntas")
+    list_display=("Descripcion","Probabilidad", "TipoPreguntas")
     search_fields=("Descripcion",)
     list_filter=("TipoPreguntas",)
     exclude = ('User',)
@@ -52,13 +52,37 @@ class Preguntas_AfectaAdmin(admin.ModelAdmin):
     list_filter=("Afecta","Periodo")
 
 class TipoPreguntaAdmin(admin.ModelAdmin):
-    list_display=("TipoPregunta",)
+    list_display=("TipoPregunta", "TasaRendimiento", "SaldoInversion")
     search_fields=("TipoPregunta",)
 
 class ArchivosAdmin(admin.ModelAdmin):
     fields = ["Archivo",]
     list_display = ("Archivo",)
     search_fields = ("Archivo",)
+
+class TipoInversionesAdmin(admin.ModelAdmin):
+    list_display = ("Inversion", "TipoInversion", "RangoRendimiento")
+    search_fields=("Inversion",)
+    list_filter=("TipoInversion",)
+
+
+class TipoPrestamoAdmin(admin.ModelAdmin):
+    list_display = ("idPrestamo", "TipoPrestamo", "Duracion", "TazaInteres")
+    list_filter=("TipoPrestamo",)
+
+class TipoPrestamo_AfectAdmin(admin.ModelAdmin):
+    list_display = ("TipoPrestamo", "Afecta", "Periodo", "Cantidad", "Duracion")
+    list_filter=("TipoPrestamo",)
+
+
+"""
+TipoInversiones
+Inversion
+Inversion_Afecta
+TipoPrestamo
+Prestamo
+Prestamo_Afect
+"""
 
 admin.site.register(Requisitos, RequisitosAdmin)
 admin.site.register(Afecta, AfectaAdmin)
@@ -74,7 +98,14 @@ admin.site.register(Preguntas_Requisitos, Preguntas_RequisitosAdmin)
 admin.site.register(Preguntas_Afecta, Preguntas_AfectaAdmin)
 admin.site.register(TipoPregunta, TipoPreguntaAdmin)
 
+admin.site.register(TipoInversiones, TipoInversionesAdmin)
+
+admin.site.register(TipoPrestamo, TipoPrestamoAdmin)
+
+admin.site.register(TipoPrestamo_Afect, TipoPrestamo_AfectAdmin)
+
 admin.site.register(Archivos, ArchivosAdmin)
+
 
 #admin.site.register(User)
 #admin.site.register(Turnos)
