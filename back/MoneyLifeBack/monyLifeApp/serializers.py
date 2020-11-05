@@ -5,7 +5,7 @@ from .models import *
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
-        fields = ['id','Descripcion', 'Frecuencia', 'Probabilidad']
+        fields = ['id','Descripcion', 'Frecuencia', 'Probabilidad', 'TipoEvento']
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
