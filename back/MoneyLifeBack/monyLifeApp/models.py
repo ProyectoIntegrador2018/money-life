@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -31,15 +31,6 @@ class Afecta(models.Model):
     def __str__(self):
         return self.TipoAfect
 
-#Crear la tabla Usuario
-class User(models.Model):
-    RolUsuario = models.CharField(max_length=30)
-
-    class Meta:
-        verbose_name_plural = "Usuario"
-
-    def __str__(self):
-        return self.RolUsuario
 
 #Crear tabla Periodo
 class Periodo(models.Model):
@@ -179,7 +170,7 @@ class Prestamo(models.Model):
         verbose_name_plural = "Prestamos"
 
     def __str__(self):
-        return str(self.Cantidad)
+        return str(self.CantidadPrestada)
 
 
 #Tabla relacion con Afecta

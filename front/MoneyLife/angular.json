@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "MoneyLife"
+    }
+  },
+  "defaultProject": "MoneyLife",
+  "cli": {
+    "analytics": "1bc0cae6-cc22-4e16-8214-36c0b61245ba"
+  }
 }
