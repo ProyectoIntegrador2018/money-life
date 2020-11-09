@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { LoginService } from 'src/app/services/login.service'; //Llamar servicio de login
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [LoginService]  //Provedor login
 })
 export class LoginComponent implements OnInit {
   action = 'login';
@@ -17,11 +19,21 @@ export class LoginComponent implements OnInit {
   errorPassNew = false;
   errorPassNew2 = false;
   errorRecover = false;
-  constructor() { }
+  register; //Variable para guardar input de usuario
+  inputLogin; //Variable para login
+
+  constructor(private loginService : LoginService) { }
 
   ngOnInit(): void {
     this.initForm();
-    
+    this.register = {
+      username: '',
+      password: '' 
+    };
+    this.inputLogin = {
+      username: '',
+      password: ''  
+    };
   }
   initForm(): void {
     this.logInForm = new FormGroup({
@@ -53,6 +65,16 @@ export class LoginComponent implements OnInit {
     console.log(this.logInForm.status);
     if (this.logInForm.status === 'VALID') {
       // TODO: call services to make log in
+      this.inputLogin.username = this.logInForm.controls.user.value
+      this.inputLogin.password = this.logInForm.controls.password.value
+
+      this.loginService.onLogin(this.inputLogin).subscribe(
+        (resp) => {
+          console.log('Se inicio session')
+        },
+        (error) => console.log('error', error)
+      );
+
     } else {
       if (this.logInForm.controls.user.status === 'INVALID') {
         this.errorUser = true;
@@ -65,6 +87,15 @@ export class LoginComponent implements OnInit {
   onSubmitRegister(): void {
     if (this.registerForm.status === 'VALID') {
       // TODO: call services to make registration
+      this.register.username = this.registerForm.controls.newUser.value
+      this.register.password = this.registerForm.controls.newPassword.value
+
+      this.loginService.postRegister(this.register).subscribe(
+        (resp) => {
+          console.log('Se creo '+ this.register.username)
+        },
+        (error) => console.log('error', error)
+      );
     } else {
       if (this.registerForm.controls.newUser.status === 'INVALID') {
         this.errorUserNew = true;
