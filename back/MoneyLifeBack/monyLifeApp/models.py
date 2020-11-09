@@ -295,6 +295,7 @@ class Turnos_Afecta(models.Model):
 
 class Afecta_user(models.Model):
     Afecta = models.CharField(max_length=50)
+    Descripcion = models.CharField(max_length=150)
     User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
     TurnosEsperar = models.IntegerField()
     TurnosRestante = models.IntegerField()

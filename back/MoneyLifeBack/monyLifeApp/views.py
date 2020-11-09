@@ -64,7 +64,7 @@ def eventoAfecta(data):
         afecta_evento = Evento_Afecta.objects.filter(Evento=evento['id'])
         for afecta in afecta_evento:
             duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
-            afecta_usuario = Afecta_user(User=user, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
+            afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
             afecta_usuario.save()
 
 ###################################################################
