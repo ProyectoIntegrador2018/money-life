@@ -1,6 +1,7 @@
 from django.contrib.auth.models import *
 from rest_framework import serializers
 from .models import *
+from django.core.serializers.json import DjangoJSONEncoder
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -28,9 +29,25 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
-        fields = ['id','Descripcion', 'Frecuencia', 'Probabilidad', 'TipoEvento']
+        fields = ['id','Descripcion', 'TipoEvento']
 
 class TurnosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Turnos
         fields = ['NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
+
+class PruebaSerializer(serializers.Serializer):
+    EventoID = serializers.IntegerField()
+    Descripcion = serializers.CharField(max_length=100)
+    Periodo = serializers.CharField(max_length=50)
+    Duracion = serializers.IntegerField()
+
+class Prueba:
+    def __init__(self, EventoID, Descripcion, Periodo, Duracion):
+        self.EventoID = EventoID
+        self.Descripcion = Descripcion
+        self.Periodo = Periodo
+        self.Duracion = Duracion
+
+
+    

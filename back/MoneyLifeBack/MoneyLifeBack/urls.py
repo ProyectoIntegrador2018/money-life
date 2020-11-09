@@ -24,6 +24,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet),
 router.register(r'evento', views.EventoViewSet, basename='evento'),
 router.register(r'turno', views.TurnosViewSet, basename='turno'),
+router.register(r'prueba', views.PruebaViewSet, basename='prueba')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

@@ -9,11 +9,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from decimal import Decimal
+from rest_framework.renderers import JSONRenderer
+from django.http import JsonResponse
 
 #Login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
@@ -23,6 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 ###################################################################
 #LOGICA DE EVENTOS
+
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
@@ -32,22 +34,21 @@ class EventoViewSet(viewsets.ModelViewSet):
     def inicioTurno(self, request):
         queryset = Evento.objects.all()
         serializer = EventoSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
     #Se llama al final del turno
     @action(methods=['put'], detail=False) #se necesita el usuario
     def afectaTurno(self, request):
-        modifyEvento(request.data)
-        eventoAfecta(request.data)
+        modifyEvento(request.data) #Modifica la frcuencia del evento que se utilizo
+        eventoAfecta(request.data) #Crea los afecta del evento que se utilizo
 
         queryset = Evento.objects.all()
         serializer = EventoSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
 #Funciones que llaman los servicios de eventos
 def modifyEvento(data):
-    print("ENTRO EN MODIFICAR EVENTO")
-    user = User.objects.filter(id = 25).first() #Esto son pruebas con el usuario
+    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
     print(user.id)
 
     
@@ -58,7 +59,7 @@ def modifyEvento(data):
 
 def eventoAfecta(data):
     print("ENTRO EN AFECTA")
-    user = User.objects.filter(id = 25).first() #Esto son pruebas con el usuario
+    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
     for evento in data:
         afecta_evento = Evento_Afecta.objects.filter(Evento=evento['id'])
         for afecta in afecta_evento:
@@ -81,14 +82,14 @@ class TurnosViewSet(viewsets.ModelViewSet):
 
         afectaTurnos() #Llama a todos los afecta que esten relacionados con el cliente y los aplica
 
-        user = User.objects.filter(id = 25).first() #Esto son pruebas con el usuario
+        user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return JsonResponse(serializer.data, safe=False)
 
 #Se aplican todos los afectas relacionados con el usuario
 def afectaTurnos():
-    user = User.objects.filter(id = 25).first() #Esto son pruebas con el usuario
+    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
     turno = Turnos.objects.filter(User=user).first()
     
     afectaActions = Afecta_user.objects.filter(User=user)
@@ -158,3 +159,14 @@ def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
 ###################################################################
 
 ###################################################################
+
+class PruebaViewSet(viewsets.ViewSet):
+
+    @action(methods=['get'], detail=False)
+    def prueba2(self, request):
+        print("ENTRO A PRUEBA 2")
+        pru = Prueba(EventoID=1, Descripcion="Prueba1", Periodo="Semana", Duracion=10)
+        print(pru)
+        serializer = PruebaSerializer(pru)
+        return JsonResponse(serializer.data, safe=False)
+    
