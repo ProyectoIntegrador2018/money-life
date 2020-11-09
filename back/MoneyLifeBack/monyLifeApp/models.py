@@ -63,7 +63,8 @@ class Evento(models.Model):
     Probabilidad = models.DecimalField(max_digits=20,  decimal_places=2)
     Requisitos = models.ManyToManyField(Requisitos, through='Evento_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Evento_Afecta') #Relacion con Afecta
-    User = models.ForeignKey(User, blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
+    User = models.ManyToManyField(User, through='Evento_User')
+    #User = models.ForeignKey(User, blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
     TipoEvento = models.ForeignKey(TipoEvento,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Evento") #Relacion con TipoEvento
 
     class Meta:
@@ -93,6 +94,16 @@ class Evento_Afecta(models.Model):
     class Meta:
         unique_together = [['Afecta','Evento']]
         verbose_name_plural = "Evento_Afecta"
+
+#Tabla relacion Evento con Usuario
+class Evento_User(models.Model):
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    Frecuencia = models.IntegerField()
+
+    class Meta:
+        unique_together = [['User','Evento']]
+        verbose_name_plural = "Evento_User"
 
 #---------------------------------------------------------------
 #Crear la tabla Tipo Inversion
@@ -246,13 +257,13 @@ class Turnos(models.Model):
     DineroEfectivo = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Ingresos = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Egresos = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
-    Edad = models.IntegerField()
-    Sexo = models.CharField(max_length=10)
-    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
-    Evento = models.ForeignKey(Evento, on_delete = models.CASCADE) #Relacion con Evento
-    Preguntas = models.ForeignKey(Preguntas, on_delete = models.CASCADE) #Relacion con Preguntas
-    Requisitos = models.ManyToManyField(Requisitos, through='Turnos_Requisitos') #Relacion con Requisitos
-    Afecta = models.ManyToManyField(Afecta, through='Turnos_Afecta') #Relacion con Afecta
+    Edad = models.IntegerField(null=True)
+    Sexo = models.CharField(null=True, max_length=10)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    Evento = models.ForeignKey(Evento, null=True, on_delete = models.CASCADE) #Relacion con Evento
+    Preguntas = models.ForeignKey(Preguntas, null=True, on_delete = models.CASCADE) #Relacion con Preguntas
+    Requisitos = models.ManyToManyField(Requisitos, null=True, through='Turnos_Requisitos') #Relacion con Requisitos
+    Afecta = models.ManyToManyField(Afecta, null=True, through='Turnos_Afecta') #Relacion con Afecta
 
     class Meta:
         verbose_name_plural = "Turnos"
@@ -279,6 +290,10 @@ class Turnos_Afecta(models.Model):
         verbose_name_plural = "Turno_Requisito"
 
 
-
-
-
+class Afecta_user(models.Model):
+    Afecta = models.CharField(max_length=50)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    TurnosEsperar = models.IntegerField()
+    TurnosRestante = models.IntegerField()
+    Cantidad = models.CharField(max_length=50)
+    Duracion = models.IntegerField()

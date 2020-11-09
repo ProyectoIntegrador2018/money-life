@@ -27,4 +27,15 @@ export class TestComponent implements OnInit {
     )
   }
 
+  putTest(): void {
+    this.testService.putEvent(this.dataEventos).subscribe(
+      (resp) => {
+        console.log("todo chido ", resp);
+      },
+      (error) => {
+        console.log("Error", error);
+      }
+    )
+  }
+
 }

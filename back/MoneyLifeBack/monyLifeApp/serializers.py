@@ -2,11 +2,6 @@ from django.contrib.auth.models import *
 from rest_framework import serializers
 from .models import *
 
-class EventoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Evento
-        fields = ['id','Descripcion', 'Frecuencia', 'Probabilidad', 'TipoEvento']
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
@@ -15,4 +10,27 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validate_data): #validate_data es para hacer hash en la contraseña
         user = User.objects.create_user(**validate_data)
+        print("ESTAMOS EN SERIALIZER CREATE USER")
+        print("Se creo usuario: ",user)
+
+        #Crear turno actual del usuario
+        newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=10000, Ingresos=1000, Egresos=0, User=user)
+        newTurno.save()
+
+        #Crear relacion con todos los eventos
+        eventos = Evento.objects.all()
+        for event in eventos:
+            user_event = Evento_User(User=user, Evento=event, Frecuencia=event.Frecuencia)
+            user_event.save()
+        
         return user
+
+class EventoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Evento
+        fields = ['id','Descripcion', 'Frecuencia', 'Probabilidad', 'TipoEvento']
+
+class TurnosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Turnos
+        fields = ['NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
