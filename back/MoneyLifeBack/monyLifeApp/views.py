@@ -39,10 +39,9 @@ class EventoViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def inicioTurno(self, request):
         eventos = seleccionEvento()
-        print(eventos)
         output = json.dumps(eventos)
         response = json.loads(output)
-        #print(response)
+        print(response)
         return JsonResponse(response, safe = False)
 
     #Se llama al final del turno
@@ -78,17 +77,11 @@ def eventoAfecta(data):
 
 def seleccionEvento():
     eventos = []
-    query = 'SELECT * FROM moneydb.monylifeapp_evento e INNER JOIN moneydb.monylifeapp_tipoevento t ON e.TipoEvento_id = t.id;'
-    try:
-        db = pymysql.connect("localhost","moneylifeuser","moneylifeuser#","MoneyDB")
-        cursor = db.cursor()
-    except pymysql.Error as e :
-        print("could not close connection error pymysql %d: %s" %(e.args[0], e.args[1]))
-    df = pd.read_sql(query,db)
-    df_micro = df[df['TipoEvento'] == 'Micro']
-    df_macro = df[df['TipoEvento'] == 'Macro']
+    micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
+    query_micro = Evento.objects.filter(TipoEvento=micro_id)
+    df_micro = pd.DataFrame(list(query_micro.values()))
+    df_micro['TipoEvento'] = 'Micro'
     df_micro['FrequenciaAcumulada'] = df_micro['Frecuencia'].cumsum()
-    df_macro['FrequenciaAcumulada'] = df_macro['Frecuencia'].cumsum()
     limite_inferior = df_micro['FrequenciaAcumulada'].min()
     limite_superior = df_micro['FrequenciaAcumulada'].max()
     seleccion = random.uniform(limite_inferior,limite_superior)
@@ -96,13 +89,23 @@ def seleccionEvento():
         if (row['FrequenciaAcumulada'] >= seleccion):
             eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
             break
-    limite_inferior = df_macro['FrequenciaAcumulada'].min()
-    limite_superior = df_macro['FrequenciaAcumulada'].max()
-    seleccion = random.uniform(limite_inferior,limite_superior)
-    for index, row in df_macro.iterrows():
-        if (row['FrequenciaAcumulada'] >= seleccion):
-            eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
-            break
+    seleccion = random.uniform(0,1)
+    if(seleccion >= .7):
+        macro_id = TipoEvento.objects.get(TipoEvento = 'Macro').pk
+        query_macro = Evento.objects.filter(TipoEvento=macro_id)
+        df_macro = pd.DataFrame(list(query_macro.values()))
+        df_macro['TipoEvento'] = 'Macro'
+        df_macro['FrequenciaAcumulada'] = df_macro['Frecuencia'].cumsum()
+        limite_inferior = df_macro['FrequenciaAcumulada'].min()
+        limite_superior = df_macro['FrequenciaAcumulada'].max()
+        seleccion = random.uniform(limite_inferior,limite_superior)
+        for index, row in df_macro.iterrows():
+            if (row['FrequenciaAcumulada'] >= seleccion):
+                eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
+                break
+    else:
+        eventos.append({}) 
+    
     return eventos
 
 ###################################################################
