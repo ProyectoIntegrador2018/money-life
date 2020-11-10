@@ -1,11 +1,11 @@
 from django.db import models
-
+from cargarDatos import *
 
 # Create your models here.
 
 class Archivos(models.Model):
     Archivo = models.FileField(upload_to='Files/')
-
+    
 
     class Meta:
         verbose_name_plural = "Archivos"
