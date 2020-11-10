@@ -11,6 +11,12 @@ from rest_framework.decorators import action
 from decimal import Decimal
 from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
+import pandas as pd
+import numpy as np
+import pymysql
+import random
+import json
+
 
 #Login
 from django.contrib.auth.forms import UserCreationForm
@@ -32,9 +38,12 @@ class EventoViewSet(viewsets.ModelViewSet):
     #Se llama al inicio del turno
     @action(methods=['get'], detail=False)
     def inicioTurno(self, request):
-        queryset = Evento.objects.all()
-        serializer = EventoSerializer(queryset, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        eventos = seleccionEvento()
+        print(eventos)
+        output = json.dumps(eventos)
+        response = json.loads(output)
+        #print(response)
+        return JsonResponse(response, safe = False)
 
     #Se llama al final del turno
     @action(methods=['put'], detail=False) #se necesita el usuario
@@ -66,6 +75,35 @@ def eventoAfecta(data):
             duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
             afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
             afecta_usuario.save()
+
+def seleccionEvento():
+    eventos = []
+    query = 'SELECT * FROM moneydb.monylifeapp_evento e INNER JOIN moneydb.monylifeapp_tipoevento t ON e.TipoEvento_id = t.id;'
+    try:
+        db = pymysql.connect("localhost","moneylifeuser","moneylifeuser#","MoneyDB")
+        cursor = db.cursor()
+    except pymysql.Error as e :
+        print("could not close connection error pymysql %d: %s" %(e.args[0], e.args[1]))
+    df = pd.read_sql(query,db)
+    df_micro = df[df['TipoEvento'] == 'Micro']
+    df_macro = df[df['TipoEvento'] == 'Macro']
+    df_micro['FrequenciaAcumulada'] = df_micro['Frecuencia'].cumsum()
+    df_macro['FrequenciaAcumulada'] = df_macro['Frecuencia'].cumsum()
+    limite_inferior = df_micro['FrequenciaAcumulada'].min()
+    limite_superior = df_micro['FrequenciaAcumulada'].max()
+    seleccion = random.uniform(limite_inferior,limite_superior)
+    for index, row in df_micro.iterrows():
+        if (row['FrequenciaAcumulada'] >= seleccion):
+            eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
+            break
+    limite_inferior = df_macro['FrequenciaAcumulada'].min()
+    limite_superior = df_macro['FrequenciaAcumulada'].max()
+    seleccion = random.uniform(limite_inferior,limite_superior)
+    for index, row in df_macro.iterrows():
+        if (row['FrequenciaAcumulada'] >= seleccion):
+            eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
+            break
+    return eventos
 
 ###################################################################
 
