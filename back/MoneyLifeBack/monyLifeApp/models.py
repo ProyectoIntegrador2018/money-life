@@ -60,11 +60,9 @@ class TipoEvento(models.Model):
 class Evento(models.Model):
     Descripcion = models.CharField(max_length=200)
     Frecuencia = models.IntegerField()
-    Probabilidad = models.DecimalField(max_digits=20,  decimal_places=2)
     Requisitos = models.ManyToManyField(Requisitos, through='Evento_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Evento_Afecta') #Relacion con Afecta
     User = models.ManyToManyField(User, through='Evento_User')
-    #User = models.ForeignKey(User, blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
     TipoEvento = models.ForeignKey(TipoEvento,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Evento") #Relacion con TipoEvento
 
     class Meta:
@@ -220,10 +218,10 @@ class InversionPregunta(models.Model):
 #Crear tabla Preguntas
 class Preguntas(models.Model):
     Descripcion = models.CharField(max_length=200)
-    Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2, verbose_name="Frecuencia")
+    Frecuencia = models.IntegerField()
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
-    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
+    User = models.ManyToManyField(User, through='Preguntas_User') #Relacion con User
     TipoPreguntas = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE, verbose_name="Tipo Pregunta") #Relacion con TipoPreguntas
 
     class Meta:
@@ -251,6 +249,16 @@ class Preguntas_Afecta(models.Model):
     class Meta:
         unique_together = [['Afecta','Preguntas']]
         verbose_name_plural = "Pregunta_Afecta"
+
+class Preguntas_User(models.Model):
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    Pregunta = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
+    Frecuencia = models.IntegerField()
+    
+
+    class Meta:
+        unique_together = [['User','Pregunta']]
+        verbose_name_plural = "Preguntas_User"
 
 #---------------------------------------------------------------
 

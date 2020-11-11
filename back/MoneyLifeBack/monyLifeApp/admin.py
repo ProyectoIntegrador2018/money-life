@@ -38,7 +38,7 @@ class TipoEventoAdmin(admin.ModelAdmin):
     search_fields=("TipoEvento",)
 
 class PreguntasAdmin(admin.ModelAdmin):
-    list_display=("Descripcion","Probabilidad", "TipoPreguntas")
+    list_display=("Descripcion","Frecuencia", "TipoPreguntas")
     search_fields=("Descripcion",)
     list_filter=("TipoPreguntas",)
     exclude = ('User',)
