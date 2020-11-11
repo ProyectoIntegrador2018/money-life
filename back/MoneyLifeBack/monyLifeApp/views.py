@@ -212,6 +212,14 @@ def seleccionEvento():
 ###################################################################
 
 ###################################################################
+class PreguntaViewSet(viewsets.ModelViewSet):
+    queryset = Preguntas.objects.all()
+    serializer_class = PreguntasSerializer
+
+    
+###################################################################
+
+###################################################################
 #LOGICA DE TURNOS
 
 class TurnosViewSet(viewsets.ModelViewSet):

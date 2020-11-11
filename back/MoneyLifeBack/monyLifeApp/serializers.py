@@ -51,6 +51,11 @@ class InversionesSerializer(serializers.ModelSerializer):
         model = Inversion
         fields = ['id','NombreInversion', 'TipoEmpresa', 'SaldoInicial', 'SaldoAportacion', 'Aportacion', 'SaldoActual']
 
+class PreguntasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Preguntas
+        fields = ['id','Descripcion', 'TipoPreguntas']
+
 class PruebaSerializer(serializers.Serializer):
     EventoID = serializers.IntegerField()
     Descripcion = serializers.CharField(max_length=100)

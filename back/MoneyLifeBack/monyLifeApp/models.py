@@ -220,7 +220,7 @@ class InversionPregunta(models.Model):
 #Crear tabla Preguntas
 class Preguntas(models.Model):
     Descripcion = models.CharField(max_length=200)
-    Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2, verbose_name="Frecuencia")
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
     User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
