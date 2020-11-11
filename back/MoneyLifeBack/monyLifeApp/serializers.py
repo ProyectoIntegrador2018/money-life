@@ -36,6 +36,11 @@ class TurnosSerializer(serializers.ModelSerializer):
         model = Turnos
         fields = ['NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
 
+class PrestamosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoPrestamo
+        fields = ['TipoPrestamo', 'Duracion', 'TazaInteres']
+
 class PruebaSerializer(serializers.Serializer):
     EventoID = serializers.IntegerField()
     Descripcion = serializers.CharField(max_length=100)

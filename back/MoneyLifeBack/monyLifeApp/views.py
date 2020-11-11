@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from decimal import Decimal
 from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
+import re
 
 #Login
 from django.contrib.auth.forms import UserCreationForm
@@ -80,7 +81,8 @@ class TurnosViewSet(viewsets.ModelViewSet):
     @action(methods=['get', 'put'], detail=False)  #se necesita el usuario
     def inicio(self, request):
 
-        afectaTurnos() #Llama a todos los afecta que esten relacionados con el cliente y los aplica
+        #afectaTurnos() #Llama a todos los afecta que esten relacionados con el cliente y los aplica
+        prestamosTurnos() #Llama a todos los prestamos relacionados con este cliente para aplicar el gasto
 
         user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
         queryset = Turnos.objects.filter(User=user)
@@ -156,6 +158,115 @@ def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
             return True
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
         return True
+
+def prestamosTurnos():
+    user = User.objects.filter(id = 2).first() #Esto son pruebas con el usuario
+    turno = Turnos.objects.filter(User=user).first()
+    prestamos = Prestamo.objects.filter(User=user)
+
+    for prestamo in prestamos:
+        print("prestamo=",prestamo)
+        turno.DineroEfectivo = turno.DineroEfectivo - prestamo.Mensualidad
+        tipoPrestamo = prestamo.idPrestamo
+        print(tipoPrestamo)
+        
+        tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = str(tipoPrestamo)).first()
+
+        prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - prestamo.Mensualidad
+
+        if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
+            prestamo.Mensualidad = prestamo.SaldoAbsoluto
+
+        interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
+        interes = float(interes)/100
+        interesMensual = prestamo.SaldoAbsoluto * Decimal(interes/12)
+
+        prestamo.Interes = interesMensual
+        prestamo.save()
+
+        if prestamo.SaldoAbsoluto <= 0:
+            prestamo.delete()
+
+        turno.save()
+        
+
+
+###################################################################
+
+###################################################################
+
+class PrestamoViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+
+
+    @action(methods=['get'], detail=False)
+    def catalogo(self, request):
+        queryset = TipoPrestamo.objects.all()
+        serializer = PrestamosSerializer(queryset, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    @action(methods=['put'], detail=False)
+    def Realizar(self, request):
+
+        jsonPrestamo = request.data
+
+        minimoAprobatorio = jsonPrestamo["ValorTotal"] * .10
+
+        if jsonPrestamo["Enganche"] < minimoAprobatorio:
+            return JsonResponse({"error": "El enganche no puede ser menor al 10 porciento del valor total"}, safe=False)
+
+        if jsonPrestamo["Enganche"] >= jsonPrestamo["ValorTotal"]:
+            return JsonResponse({"error": "El enganche es mayor al prestamo pedido"}, safe=False)
+
+        user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
+        turno = Turnos.objects.filter(User=user).first()
+        tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = jsonPrestamo["PrestamoID"]).first()
+        cantidadPrestada = jsonPrestamo["ValorTotal"] - jsonPrestamo["Enganche"]
+
+        interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
+        interes = float(interes)/100
+        anos = (tipoPrestamo.Duracion).split(" ")
+        anos = int(anos[0])
+        pagoMensual = cantidadPrestada/((1 - (pow((1 + (interes/12)), (-(anos*12)))))/(interes/12))
+        interesMensual = cantidadPrestada*(interes/12)
+        print(pagoMensual)
+        print(interesMensual)
+
+        if turno.Ingresos < pagoMensual:
+            return JsonResponse({"error": "No cuentas con los ingresos necesarios para realizar este pedido"}, safe=False)
+
+        prestamoUser = Prestamo(User=user, idPrestamo=tipoPrestamo, ValorTotal=jsonPrestamo["ValorTotal"], CantidadPrestada=cantidadPrestada, Enganche=jsonPrestamo["Enganche"], Frecuencia=4, Amortizacion=0, Interes=interesMensual, Mensualidad=pagoMensual, AbonoCapital=0, SaldoAbsoluto=cantidadPrestada )
+        prestamoUser.save()
+
+        return JsonResponse({}, safe=False)
+
+    @action(methods=['put'], detail=False)
+    def Amortizacion(self, request):
+
+        jsonPrestamo = request.data
+
+        user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
+        prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
+
+        if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
+            return JsonResponse({"error": "El saldo absoluto es menos que la amortización"}, safe=False)
+
+        prestamo.AbonoCapital = jsonPrestamo["Amortizacion"] + prestamo.AbonoCapital
+
+        prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - jsonPrestamo["Amortizacion"]
+
+        if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
+            prestamo.Mensualidad = prestamo.SaldoAbsoluto
+
+        prestamo.save()
+
+        if prestamo.SaldoAbsoluto <= 0:
+            prestamo.delete()
+        
+        return JsonResponse({}, safe=False)
+
+
 ###################################################################
 
 ###################################################################

@@ -162,6 +162,7 @@ class Prestamo(models.Model):
     ValorTotal = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     CantidadPrestada = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Enganche = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Frecuencia = models.IntegerField()
     Amortizacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Interes = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Mensualidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
