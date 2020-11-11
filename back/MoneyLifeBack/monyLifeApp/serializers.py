@@ -29,7 +29,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evento
-        fields = ['id','Descripcion', 'TipoEvento', 'Frecuencia']
+        fields = ['id','Descripcion', 'TipoEvento']
 
 class TurnosSerializer(serializers.ModelSerializer):
     class Meta:

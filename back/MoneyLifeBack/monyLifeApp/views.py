@@ -13,7 +13,6 @@ from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
 import pandas as pd
 import numpy as np
-import pymysql
 import random
 import json
 
@@ -75,34 +74,135 @@ def eventoAfecta(data):
             afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
             afecta_usuario.save()
 
-def seleccionEvento():
-    eventos = []
-    micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
-    query_micro = Evento.objects.filter(TipoEvento=micro_id)
-    df_micro = pd.DataFrame(list(query_micro.values()))
-    df_micro['TipoEvento'] = 'Micro'
-    df_micro['FrequenciaAcumulada'] = df_micro['Frecuencia'].cumsum()
-    limite_inferior = df_micro['FrequenciaAcumulada'].min()
-    limite_superior = df_micro['FrequenciaAcumulada'].max()
+def verificarRequisitos(id):
+    print('eventosRequisitosfunc')
+    user = User.objects.filter(id = 2).first() #Esto son pruebas con el usuario
+    turno = Turnos.objects.filter(User=user).first()
+    requisitos = Evento_Requisitos.objects.filter(Evento = id)
+    if not requisitos:
+        return True
+    else:
+        for requisito in requisitos:
+            req = str(requisito.Requisito)
+            cant = str(requisito.Cantidad)
+            event = str(requisito.Evento)
+            if (req == 'Felicidad'):
+                if(cant[0] == '>'):
+                    if(turno.Felicidad > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Felicidad < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Felicidad >= int(cant.split('-')[0])) and (turno.Felicidad <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+                        
+            elif (req == 'Ingresos'):
+                if(cant[0] == '>'):
+                    if(turno.Ingresos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Ingresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Ingresos >= int(cant.split('-')[0])) and (turno.Ingresos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+                
+            elif (req == 'NumeroTurnos'):
+                if(cant[0] == '>'):
+                    if(turno.NumeroTurnos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.NumeroTurnos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+            elif (req == 'DineroEfectivo'):
+                if(cant[0] == '>'):
+                    if(turno.NumeroTurnos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.NumeroTurnos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+            elif (req == 'Egresos'):
+                if(cant[0] == '>'):
+                    if(turno.Egresos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Egresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Egresos >= int(cant.split('-')[0])) and (turno.Egresos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+        return True
+
+def getSeleccion(queryset, tipoEvento, eventos):
+    df = pd.DataFrame(list(queryset.values()))
+    df['FrecuenciaAcumulada'] = df['Frecuencia'].cumsum()
+    limite_inferior = df['FrecuenciaAcumulada'].min()
+    limite_superior = df['FrecuenciaAcumulada'].max()
     seleccion = random.uniform(limite_inferior,limite_superior)
-    for index, row in df_micro.iterrows():
-        if (row['FrequenciaAcumulada'] >= seleccion):
-            eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
-            break
+    for index, row in df.iterrows():
+        if (row['FrecuenciaAcumulada'] >= seleccion):
+            if(tipoEvento == 'Micro'):
+                if(verificarRequisitos(row['id'])):
+                    temp = row[['id','Descripcion']].to_dict()
+                    temp['TipoEvento'] = 'Micro'
+                    eventos.append(temp)
+                    break
+                else:
+                    pass
+            else:
+                temp = row[['id','Descripcion']].to_dict()
+                temp['TipoEvento'] = 'Macro'
+                eventos.append(temp)
+                break
+
+def seleccionEvento():
+    micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk        
+    eventos = []
+    query_micro = Evento.objects.filter(TipoEvento=micro_id)
+    seleccion = 0
+    getSeleccion(query_micro, 'Micro', eventos)
     seleccion = random.uniform(0,1)
     if(seleccion >= .7):
         macro_id = TipoEvento.objects.get(TipoEvento = 'Macro').pk
         query_macro = Evento.objects.filter(TipoEvento=macro_id)
-        df_macro = pd.DataFrame(list(query_macro.values()))
-        df_macro['TipoEvento'] = 'Macro'
-        df_macro['FrequenciaAcumulada'] = df_macro['Frecuencia'].cumsum()
-        limite_inferior = df_macro['FrequenciaAcumulada'].min()
-        limite_superior = df_macro['FrequenciaAcumulada'].max()
-        seleccion = random.uniform(limite_inferior,limite_superior)
-        for index, row in df_macro.iterrows():
-            if (row['FrequenciaAcumulada'] >= seleccion):
-                eventos.append(row[['id','Descripcion','TipoEvento']].to_dict())
-                break
+        getSeleccion(query_macro, 'Macro', eventos)
     else:
         eventos.append({}) 
     
