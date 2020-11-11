@@ -82,8 +82,9 @@ class TurnosViewSet(viewsets.ModelViewSet):
     @action(methods=['get', 'put'], detail=False)  #se necesita el usuario
     def inicio(self, request):
 
-        #afectaTurnos() #Llama a todos los afecta que esten relacionados con el cliente y los aplica
-        prestamosTurnos() #Llama a todos los prestamos relacionados con este cliente para aplicar el gasto
+        #afectaTurnos() #Llama a todos los afecta que esten relacionados con el usuario y los aplica
+        prestamosTurnos() #Llama a todos los prestamos relacionados con este usuario para aplicar el gasto
+        #inversionesTurnos() #Llama a todas las inversiones relacionados con este usuario y aplica su flujo
 
         user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
         queryset = Turnos.objects.filter(User=user)
@@ -189,7 +190,6 @@ def prestamosTurnos():
             prestamo.delete()
 
         turno.save()
-
 
 ###################################################################
 
