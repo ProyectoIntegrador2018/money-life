@@ -12,6 +12,7 @@ from decimal import Decimal
 from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
 import re
+import random
 
 #Login
 from django.contrib.auth.forms import UserCreationForm
@@ -188,7 +189,6 @@ def prestamosTurnos():
             prestamo.delete()
 
         turno.save()
-        
 
 
 ###################################################################
@@ -196,8 +196,8 @@ def prestamosTurnos():
 ###################################################################
 
 class PrestamoViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
+    queryset = TipoPrestamo.objects.all()
+    serializer_class = PrestamosSerializer
 
 
     @action(methods=['get'], detail=False)
@@ -266,6 +266,98 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         
         return JsonResponse({}, safe=False)
 
+###################################################################
+
+###################################################################
+class InversionViewSet(viewsets.ModelViewSet):
+    queryset = TipoInversiones.objects.all()
+    serializer_class = TipoInversionesSerializer
+
+    @action(methods=['get'], detail=False)
+    def catalogoDisponibles(self, request):
+
+        jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        actuales = Inversion.objects.filter(User=user)
+        catalogo = TipoInversiones.objects.all()
+
+        for inversionActual in actuales:
+            catalogo = catalogo.exclude(id=inversionActual.TipoInversion.id)
+
+        queryset = catalogo
+        serializer = TipoInversionesSerializer(queryset, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    @action(methods=['get'], detail=False)
+    def inversinesActuales(self, request):
+
+        jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        actuales = Inversion.objects.filter(User=user)
+
+        queryset = actuales
+        serializer = InversionesSerializer(queryset, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    
+    @action(methods=['post'], detail=False)
+    def nueva(self, request):
+
+        jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        compania = TipoInversiones.objects.filter(id=jsonInversion["InversionID"]).first()
+
+        rangoRendimiento = (compania.RangoRendimiento).split(" ")
+
+        limite_inferior = float(rangoRendimiento[0])
+        limite_superior = float(rangoRendimiento[2])
+
+        tasaRendimiento = random.uniform(limite_inferior,limite_superior)
+
+        nuvaInversion = Inversion(User=user,TipoInversion=compania,NombreInversion=compania.Inversion,TipoEmpresa=compania.TipoInversion,SaldoInicial=jsonInversion['Cantidad'],SaldoAportacion=jsonInversion['Cantidad'],EventoExterno=0,TasaRendimiento=tasaRendimiento,Aportacion=0,SaldoActual=jsonInversion['Cantidad'])
+        nuvaInversion.save()
+
+        return JsonResponse({}, safe=False)
+
+    @action(methods=['put'], detail=False)
+    def agregarDinero(self, request):
+
+        jsonInversion = request.data
+        inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
+
+        inversion.SaldoAportacion = inversion.SaldoAportacion + jsonInversion["Cantidad"]
+        inversion.SaldoActual = inversion.SaldoActual + jsonInversion["Cantidad"]
+        inversion.save()
+        
+        return JsonResponse({}, safe=False)
+
+    @action(methods=['put'], detail=False)
+    def retirarDinero(self, request):
+        
+        jsonInversion = request.data
+        inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
+
+        if jsonInversion["Cantidad"] >= inversion.SaldoActual:
+            return JsonResponse({"error":"No cuentas con suficiente dinero para retirar esta cantidad"}, safe=False)
+
+        inversion.Aportacion = inversion.Aportacion + jsonInversion["Cantidad"]
+        inversion.SaldoActual = inversion.SaldoActual - jsonInversion["Cantidad"]
+        inversion.save()
+        
+        return JsonResponse({}, safe=False)
+
+    @action(methods=['put'], detail=False)
+    def retirarAccion(self, request):
+        
+        jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        turno = Turnos.objects.filter(User=user).first()
+        inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
+
+        turno.DineroEfectivo = turno.DineroEfectivo + inversion.SaldoActual
+        inversion.delete()
+        turno.save()
+        
+        return JsonResponse({}, safe=False)
 
 ###################################################################
 
