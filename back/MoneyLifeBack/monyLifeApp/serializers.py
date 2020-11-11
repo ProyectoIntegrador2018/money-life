@@ -34,7 +34,27 @@ class EventoSerializer(serializers.ModelSerializer):
 class TurnosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Turnos
-        fields = ['NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
+        fields = ['id','NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
+
+class PrestamosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoPrestamo
+        fields = ['id','TipoPrestamo', 'Duracion', 'TazaInteres']
+
+class TipoInversionesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TipoInversiones
+        fields = ['id','Inversion', 'TipoInversion', 'RangoRendimiento']
+
+class InversionesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inversion
+        fields = ['id','NombreInversion', 'TipoEmpresa', 'SaldoInicial', 'SaldoAportacion', 'Aportacion', 'SaldoActual']
+
+class PreguntasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Preguntas
+        fields = ['id','Descripcion', 'TipoPreguntas']
 
 class PruebaSerializer(serializers.Serializer):
     EventoID = serializers.IntegerField()
