@@ -69,16 +69,18 @@ def eventoAfecta(user, eventos):
                     afecta_usuario = Afecta_user(User=user, Descripcion=evento["Descripcion"], Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
                     afecta_usuario.save()
 
-def verificarRequisitos(id, turno):
-    print('eventosRequisitosfunc')
-    requisitos = Evento_Requisitos.objects.filter(Evento = id)
+def verificarRequisitos(id, turno, flag_tipo):
+    print('Requisitosfunc')
+    if(flag_tipo == 'Pregunta'):
+        requisitos = Preguntas_Requisitos.objects.filter(Preguntas_id = id)
+    else:
+        requisitos = Evento_Requisitos.objects.filter(Evento = id)
     if not requisitos:
         return True
     else:
         for requisito in requisitos:
             req = str(requisito.Requisito)
             cant = str(requisito.Cantidad)
-            event = str(requisito.Evento)
             if (req == 'Felicidad'):
                 if(cant[0] == '>'):
                     if(turno.Felicidad > int(cant.split('>')[1])):
@@ -95,6 +97,11 @@ def verificarRequisitos(id, turno):
                         pass
                     else:
                         return False
+                elif(cant[0] == '='):
+                    if (turno.Felicidad == int(cant.split('=')[1]) ):
+                        pass
+                    else:
+                        return False
                         
             elif (req == 'Ingresos'):
                 if(cant[0] == '>'):
@@ -104,6 +111,11 @@ def verificarRequisitos(id, turno):
                         return False
                 elif(cant[0] == '<'):
                     if(turno.Ingresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '='):
+                    if(turno.Ingresos < int(cant.split('=')[1])):
                         pass
                     else:
                         return False
@@ -124,6 +136,11 @@ def verificarRequisitos(id, turno):
                         pass
                     else:
                         return False
+                elif(cant[0] == '='):
+                    if(turno.NumeroTurnos < int(cant.split('=')[1])):
+                        pass
+                    else:
+                        return False
                 elif(cant.find('-') > 0):
                     if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
                         pass
@@ -140,6 +157,11 @@ def verificarRequisitos(id, turno):
                         pass
                     else:
                         return False
+                elif(cant[0] == '='):
+                    if(turno.NumeroTurnos < int(cant.split('=')[1])):
+                        pass
+                    else:
+                        return False
                 elif(cant.find('-') > 0):
                     if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
                         pass
@@ -153,6 +175,11 @@ def verificarRequisitos(id, turno):
                         return False
                 elif(cant[0] == '<'):
                     if(turno.Egresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '='):
+                    if(turno.Egresos < int(cant.split('=')[1])):
                         pass
                     else:
                         return False
@@ -215,8 +242,74 @@ def seleccionEvento(user):
 
 ###################################################################
 class PreguntaViewSet(viewsets.ModelViewSet):
-    queryset = Preguntas.objects.all()
-    serializer_class = PreguntasSerializer
+
+    @action(methods=['get'], detail=False)
+    def getPreguntas(self, request):
+        preguntas = seleccionPregunta()
+        output = json.dumps(preguntas)
+        response = json.loads(output)
+        print(response)
+        return JsonResponse(response, safe = False)
+
+def isInList(key,value,listdict):
+    if listdict == []:
+        return True
+    else:
+        for pregunta in listdict:
+            print(pregunta)
+            print(value)
+            if pregunta[key] == value:
+                return False
+            else:
+                return True
+
+
+def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
+    df = pd.DataFrame(list(queryset.values()))
+    for x in range(0,4,1):
+        borrar = -10
+        df['FrecuenciaAcumulada'] = df['Frecuencia'].cumsum()
+        limite_inferior = df['FrecuenciaAcumulada'].min()
+        limite_superior = df['FrecuenciaAcumulada'].max()
+        seleccion = random.uniform(limite_inferior,limite_superior)
+        for index, row in df.iterrows():
+            if (row['FrecuenciaAcumulada'] >= seleccion):
+                if(verificarRequisitos(row['Pregunta_id'], turno, 'Pregunta')):
+                    desc = Preguntas.objects.get(id=row['Pregunta_id'])
+                    desc = str(desc.Descripcion)
+                    descTipo = TipoPregunta.objects.get(id=row['TipoPreguntas_id'])
+                    descTipo = str(descTipo.TipoPregunta)
+                    temp = row[['Pregunta_id']].to_dict()
+                    temp['Descripcion'] = desc
+                    temp['TipoEvento'] = descTipo
+                    preguntas.append(temp)
+                    borrar = index
+                    print(row['Pregunta_id'])
+                    print(row['TipoPreguntas_id'])
+                    df.drop(borrar, inplace = True, errors = 'ignore' )
+                    borrar = -10
+                else:
+                    pass
+        
+
+def seleccionPregunta():
+    user = User.objects.filter(id = 4).first() #Esto son pruebas con el usuario
+    turno = Turnos.objects.filter(User=user).first()
+    preguntas = []
+    PreguntasDisp = Preguntas_User.objects.values_list('Pregunta','Frecuencia','TipoPreguntas').exclude(Frecuencia=0)
+    inversion_id = TipoPregunta.objects.values_list('id',flat=True).filter(TipoPregunta__startswith = 'Inversion')
+    diversion_id = TipoPregunta.objects.get(TipoPregunta = 'Diversion').pk
+    bienes_id = TipoPregunta.objects.get(TipoPregunta = 'Bienes Personales').pk
+    laboral_id = TipoPregunta.objects.get(TipoPregunta= 'Laboral').pk
+    query_inversion = PreguntasDisp.filter(TipoPreguntas__in=inversion_id, User=user)
+    query_diversion = PreguntasDisp.filter(TipoPreguntas=diversion_id,User=user)
+    query_bienes = PreguntasDisp.filter(TipoPreguntas=bienes_id,User=user)
+    query_laboral = PreguntasDisp.filter(TipoPreguntas=laboral_id,User=user)
+    getSeleccionPregunta(query_inversion, 'Inversion', preguntas, turno)
+    getSeleccionPregunta(query_diversion, 'Diversion', preguntas, turno)
+    getSeleccionPregunta(query_bienes, 'Bienes Personales', preguntas, turno)
+    getSeleccionPregunta(query_laboral, 'Laboral', preguntas, turno)
+    return preguntas 
 
 
 ###################################################################
