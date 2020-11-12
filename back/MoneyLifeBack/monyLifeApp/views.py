@@ -245,7 +245,9 @@ class PreguntaViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def getPreguntas(self, request):
-        preguntas = seleccionPregunta()
+        jsonUser = request.data
+        user = User.objects.filter(id = jsonUser['UserID']).first()
+        preguntas = seleccionPregunta(user)
         output = json.dumps(preguntas)
         response = json.loads(output)
         print(response)
@@ -292,8 +294,7 @@ def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
                     pass
         
 
-def seleccionPregunta():
-    user = User.objects.filter(id = 4).first() #Esto son pruebas con el usuario
+def seleccionPregunta(user):
     turno = Turnos.objects.filter(User=user).first()
     preguntas = []
     PreguntasDisp = Preguntas_User.objects.values_list('Pregunta','Frecuencia','TipoPreguntas').exclude(Frecuencia=0)
