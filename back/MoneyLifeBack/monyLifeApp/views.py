@@ -37,42 +37,37 @@ class EventoViewSet(viewsets.ModelViewSet):
     #Se llama al inicio del turno
     @action(methods=['get'], detail=False)
     def inicioTurno(self, request):
-        eventos = seleccionEvento()
+        print("ENTROOOOO INICIOOOO TURNOOOO")
+        jsonUser = request.data
+        user = User.objects.filter(id = jsonUser['UserID']).first() 
+        eventos = seleccionEvento(user)
         output = json.dumps(eventos)
         response = json.loads(output)
-        print(response)
+        print("Response = ",response)
+
+        modifyEvento(user, response) #Modifica la frcuencia del evento que se utilizo
+        eventoAfecta(user, response) #Crea los afecta del evento que se utilizo
+
         return JsonResponse(response, safe = False)
 
-    #Se llama al final del turno
-    @action(methods=['put'], detail=False) #se necesita el usuario
-    def afectaTurno(self, request):
-        modifyEvento(request.data) #Modifica la frcuencia del evento que se utilizo
-        eventoAfecta(request.data) #Crea los afecta del evento que se utilizo
-
-        queryset = Evento.objects.all()
-        serializer = EventoSerializer(queryset, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
 #Funciones que llaman los servicios de eventos
-def modifyEvento(data):
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
-    print(user.id)
-
+def modifyEvento(user, eventos):
     
-    for evento in data:
-        changefrecuencia = Evento_User.objects.get(User=user.id, Evento=evento['id'])
-        Evento_User.objects.filter(User=user.id, Evento=evento['id']).update(Frecuencia=changefrecuencia.Frecuencia - 1)
+    if eventos != None:
+        for evento in eventos:
+            if evento != {}:
+                changefrecuencia = Evento_User.objects.get(User=user.id, Evento=evento['id'])
+                Evento_User.objects.filter(User=user.id, Evento=evento['id']).update(Frecuencia=changefrecuencia.Frecuencia - 1)
     
-
-def eventoAfecta(data):
-    print("ENTRO EN AFECTA")
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
-    for evento in data:
-        afecta_evento = Evento_Afecta.objects.filter(Evento=evento['id'])
-        for afecta in afecta_evento:
-            duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
-            afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
-            afecta_usuario.save()
+def eventoAfecta(user, eventos):
+    if eventos != None:
+        for evento in eventos:
+            if evento != {}:
+                afecta_evento = Evento_Afecta.objects.filter(Evento=evento['id'])
+                for afecta in afecta_evento:
+                    duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
+                    afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
+                    afecta_usuario.save()
 
 def verificarRequisitos(id, turno):
     print('eventosRequisitosfunc')
@@ -197,16 +192,15 @@ def getSeleccion(queryset, tipoEvento, eventos, turno):
                 break
 
 
-def seleccionEvento():
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
+def seleccionEvento(user):
     turno = Turnos.objects.filter(User=user).first()
     eventos = []
     seleccion = 0
     eventosDisp = Evento_User.objects.values_list('Evento','Frecuencia','TipoEvento').exclude(Frecuencia=0)
-    for evento in eventosDisp:
-        print(evento)
     micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
     query_micro = eventosDisp.filter(TipoEvento=micro_id)
+    if not query_micro:
+        return eventos.append({})
     getSeleccion(query_micro, 'Micro', eventos, turno)
     seleccion = random.uniform(0,1)
     if(seleccion >= .7):
@@ -532,6 +526,22 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.save()
         
         return JsonResponse({}, safe=False)
+
+###################################################################
+
+###################################################################
+class FinJuegoViewSet(viewsets.ModelViewSet):
+
+    @action(methods=['put'], detail=False)
+    def juego(self, request):
+        jsonUser = request.data
+        user = User.objects.filter(id = jsonUser['UserID']).first()
+
+        user.delete()
+
+        return JsonResponse({}, safe=False)
+
+
 
 ###################################################################
 
