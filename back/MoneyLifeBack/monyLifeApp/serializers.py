@@ -21,13 +21,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         #Crear relacion con todos los eventos
         eventos = Evento.objects.all()
         for event in eventos:
-            user_event = Evento_User(User=user, Evento=event, Frecuencia=event.Frecuencia)
+            user_event = Evento_User(User=user, Evento=event, Frecuencia=event.Frecuencia, TipoEvento=event.TipoEvento)
             user_event.save()
 
         #Crear relacion con todas las preguntas
         preguntas = Preguntas.objects.all()
         for pregu in preguntas:
-            user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia)
+            user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia, TipoPreguntas=pregu.TipoPreguntas)
             user_pregu.save()
         
         return user
