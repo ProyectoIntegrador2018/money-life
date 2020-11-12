@@ -203,8 +203,6 @@ def seleccionEvento():
     eventos = []
     seleccion = 0
     eventosDisp = Evento_User.objects.values_list('Evento','Frecuencia','TipoEvento').exclude(Frecuencia=0)
-    for evento in eventosDisp:
-        print(evento)
     micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
     query_micro = eventosDisp.filter(TipoEvento=micro_id)
     getSeleccion(query_micro, 'Micro', eventos, turno)
@@ -221,8 +219,154 @@ def seleccionEvento():
 
 ###################################################################
 class PreguntaViewSet(viewsets.ModelViewSet):
-    queryset = Preguntas.objects.all()
-    serializer_class = PreguntasSerializer
+    
+    
+
+    @action(methods=['get'], detail=False)
+    def getPreguntas(self, request):
+        preguntas = seleccionPregunta()
+        output = json.dumps(preguntas)
+        response = json.loads(output)
+        print(response)
+        return JsonResponse(response, safe = False)
+
+def verificarRequisitosPregunta(turno):
+    requisitos = Preguntas_Requisitos.objects.filter(Evento = id)
+    if not requisitos:
+        return True
+    else:
+        for requisito in requisitos:
+            req = str(requisito.Requisito)
+            cant = str(requisito.Cantidad)
+            event = str(requisito.Evento)
+            if (req == 'Inversion'):
+                if(cant[0] == '>'):
+                    if(turno.Felicidad > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Felicidad < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Felicidad >= int(cant.split('-')[0])) and (turno.Felicidad <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+                        
+            elif (req == 'Ingresos'):
+                if(cant[0] == '>'):
+                    if(turno.Ingresos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Ingresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Ingresos >= int(cant.split('-')[0])) and (turno.Ingresos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+                
+            elif (req == 'NumeroTurnos'):
+                if(cant[0] == '>'):
+                    if(turno.NumeroTurnos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.NumeroTurnos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+            elif (req == 'DineroEfectivo'):
+                if(cant[0] == '>'):
+                    if(turno.NumeroTurnos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.NumeroTurnos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.NumeroTurnos >= int(cant.split('-')[0])) and (turno.NumeroTurnos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+            elif (req == 'Egresos'):
+                if(cant[0] == '>'):
+                    if(turno.Egresos > int(cant.split('>')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant[0] == '<'):
+                    if(turno.Egresos < int(cant.split('<')[1])):
+                        pass
+                    else:
+                        return False
+                elif(cant.find('-') > 0):
+                    if ((turno.Egresos >= int(cant.split('-')[0])) and (turno.Egresos <= int(cant.split('-')[1]))):
+                        pass
+                    else:
+                        return False
+        return True
+
+
+
+def getSeleccionPregunta(queryset, tipoEvento, eventos, turno):
+    df = pd.DataFrame(list(queryset.values()))
+    df['FrecuenciaAcumulada'] = df['Frecuencia'].cumsum()
+    limite_inferior = df['FrecuenciaAcumulada'].min()
+    limite_superior = df['FrecuenciaAcumulada'].max()
+    seleccion = random.uniform(limite_inferior,limite_superior)
+    for index, row in df.iterrows():
+        if (row['FrecuenciaAcumulada'] >= seleccion):
+            if(tipoEvento == 'Inversion'):
+                if(verificarRequisitos(row['id'], turno)):
+                    desc = Preguntas.objects.get(id=row['id'])
+                    desc = str(desc.Descripcion)
+                    temp = row[['id']].to_dict()
+                    temp['TipoEvento'] = 'Inversion'
+                    temp['Descripcion'] = desc
+                    eventos.append(temp)
+                    break
+                else:
+                    pass
+        
+
+
+
+def seleccionPregunta():
+    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
+    turno = Turnos.objects.filter(User=user).first()
+    preguntas = []
+    seleccion = 0
+    PreguntasDisp = Preguntas_User.objects.values_list('Pregunta','Frecuencia','TipoPregunta').exclude(Frecuencia=0)
+    inversion_id = TipoPregunta.objects.get(TipoEvento__startswith = 'Inversion').pk
+    diversion_id = TipoPregunta.objects.get(TipoEvento = 'Diversion').pk
+    bienes_id = TipoPregunta.objects.get(TipoEvento = 'Bienes Personales').pk
+    laboral_id = TipoPregunta.objects.get(TipoEvento = 'Laboral').pk
+    query_inversion = PreguntasDisp.filter(TipoEvento=inversion_id)
+    query_diversion = PreguntasDisp.filter(TipoEvento=diversion_id)
+    query_bienes = PreguntasDisp.filter(TipoEvento=bienes_id)
+    query_laboral = PreguntasDisp.filter(TipoEvento=laboral_id)
+    getSeleccionPregunta(query_inversion, 'Inversion', preguntas, turno)
+    getSeleccionPregunta(query_diversion, 'Diversion', preguntas, turno)
+    getSeleccionPregunta(query_bienes, 'Bienes Personales', preguntas, turno)
+    getSeleccionPregunta(query_laboral, 'Laboral', preguntas, turno)
+    return preguntas 
 
 
 ###################################################################
