@@ -37,42 +37,37 @@ class EventoViewSet(viewsets.ModelViewSet):
     #Se llama al inicio del turno
     @action(methods=['get'], detail=False)
     def inicioTurno(self, request):
-        eventos = seleccionEvento()
+        print("ENTROOOOO INICIOOOO TURNOOOO")
+        jsonUser = request.data
+        user = User.objects.filter(id = jsonUser['UserID']).first() 
+        eventos = seleccionEvento(user)
         output = json.dumps(eventos)
         response = json.loads(output)
-        print(response)
+        print("Response = ",response)
+
+        modifyEvento(user, response) #Modifica la frcuencia del evento que se utilizo
+        eventoAfecta(user, response) #Crea los afecta del evento que se utilizo
+
         return JsonResponse(response, safe = False)
 
-    #Se llama al final del turno
-    @action(methods=['put'], detail=False) #se necesita el usuario
-    def afectaTurno(self, request):
-        modifyEvento(request.data) #Modifica la frcuencia del evento que se utilizo
-        eventoAfecta(request.data) #Crea los afecta del evento que se utilizo
-
-        queryset = Evento.objects.all()
-        serializer = EventoSerializer(queryset, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
 #Funciones que llaman los servicios de eventos
-def modifyEvento(data):
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
-    print(user.id)
-
+def modifyEvento(user, eventos):
+    if eventos != None:
+        for evento in eventos:
+            if evento != {}:
+                changefrecuencia = Evento_User.objects.get(User=user.id, Evento=evento['Evento_id'])
+                Evento_User.objects.filter(User=user.id, Evento=evento['Evento_id']).update(Frecuencia=changefrecuencia.Frecuencia - 1)
     
-    for evento in data:
-        changefrecuencia = Evento_User.objects.get(User=user.id, Evento=evento['id'])
-        Evento_User.objects.filter(User=user.id, Evento=evento['id']).update(Frecuencia=changefrecuencia.Frecuencia - 1)
-    
-
-def eventoAfecta(data):
-    print("ENTRO EN AFECTA")
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
-    for evento in data:
-        afecta_evento = Evento_Afecta.objects.filter(Evento=evento['id'])
-        for afecta in afecta_evento:
-            duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
-            afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
-            afecta_usuario.save()
+def eventoAfecta(user, eventos):
+    print("Eventos = ",eventos)
+    if eventos != None:
+        for evento in eventos:
+            if evento != {}:
+                afecta_evento = Evento_Afecta.objects.filter(Evento=evento['Evento_id'])
+                for afecta in afecta_evento:
+                    duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
+                    afecta_usuario = Afecta_user(User=user, Descripcion=evento["Descripcion"], Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
+                    afecta_usuario.save()
 
 def verificarRequisitos(id, turno, flag_tipo):
     print('Requisitosfunc')
@@ -204,10 +199,10 @@ def getSeleccion(queryset, tipoEvento, eventos, turno):
     for index, row in df.iterrows():
         if (row['FrecuenciaAcumulada'] >= seleccion):
             if(tipoEvento == 'Micro'):
-                if(verificarRequisitos(row['id'], turno, 'Evento')):
-                    desc = Evento.objects.get(id=row['id'])
+                if(verificarRequisitos(row['Evento_id'], turno)):
+                    desc = Evento.objects.get(id=row['Evento_id'])
                     desc = str(desc.Descripcion)
-                    temp = row[['id']].to_dict()
+                    temp = row[['Evento_id']].to_dict()
                     temp['TipoEvento'] = 'Micro'
                     temp['Descripcion'] = desc
                     eventos.append(temp)
@@ -215,8 +210,8 @@ def getSeleccion(queryset, tipoEvento, eventos, turno):
                 else:
                     pass
             else:
-                temp = row[['id']].to_dict()
-                desc = Evento.objects.get(id=row['id'])
+                temp = row[['Evento_id']].to_dict()
+                desc = Evento.objects.get(id=row['Evento_id'])
                 desc = str(desc.Descripcion)
                 temp['TipoEvento'] = 'Macro'
                 temp['Descripcion'] = desc
@@ -224,19 +219,20 @@ def getSeleccion(queryset, tipoEvento, eventos, turno):
                 break
 
 
-def seleccionEvento():
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
+def seleccionEvento(user):
     turno = Turnos.objects.filter(User=user).first()
     eventos = []
     seleccion = 0
     eventosDisp = Evento_User.objects.values_list('Evento','Frecuencia','TipoEvento').exclude(Frecuencia=0)
     micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
-    query_micro = eventosDisp.filter(TipoEvento=micro_id)
+    query_micro = eventosDisp.filter(TipoEvento=micro_id, User=user)
+    if not query_micro:
+        return eventos.append({})
     getSeleccion(query_micro, 'Micro', eventos, turno)
     seleccion = random.uniform(0,1)
     if(seleccion >= .7):
         macro_id = TipoEvento.objects.get(TipoEvento = 'Macro').pk
-        query_macro = eventosDisp.filter(TipoEvento=macro_id)
+        query_macro = eventosDisp.filter(TipoEvento=macro_id, User=user)
         getSeleccion(query_macro, 'Macro', eventos, turno)
     else:
         eventos.append({})
@@ -333,7 +329,8 @@ class TurnosViewSet(viewsets.ModelViewSet):
         turno = Turnos.objects.filter(User=user).first()
         prestamos = Prestamo.objects.filter(User=user)
         inversiones = Inversion.objects.filter(User=user)
-
+        
+        turnoIngresosEgresos(user, turno) #Calcula los ingresos y egresos mensuales de este turno
         afectaTurnos(user, turno) #Llama a todos los afecta que esten relacionados con el usuario y los aplica
         prestamosTurnos(user, turno, prestamos) #Llama a todos los prestamos relacionados con este usuario para aplicar el gasto
         inversionesTurnos(user, turno, inversiones) #Llama a todas las inversiones relacionados con este usuario y aplica su flujo
@@ -370,27 +367,7 @@ def afectaTurnos(user, turno):
                 
 #Es la forma en la que se modifica el turno actual del usuario (Se puede cambiar)   
 def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
-    if afecta == 'Egresos':
-        if porcentaje:
-            if suma:
-                turno.Egresos = turno.Egresos + (turno.Egresos * Decimal(cantidad))
-                return True
-            turno.Egresos = turno.Egresos - (turno.Egresos * Decimal(cantidad))
-            return True
-        turno.Egresos = turno.Egresos + Decimal(cantidad)
-        return True
-            
-    elif afecta == 'Ingresos':
-        if porcentaje:
-            if suma:
-                turno.Ingresos = turno.Ingresos + (turno.Ingresos * Decimal(cantidad))
-                return True
-            turno.Ingresos = turno.Ingresos - (turno.Ingresos * Decimal(cantidad))
-            return True
-        turno.Ingresos = turno.Ingresos + Decimal(cantidad)
-        return True
-
-    elif afecta == 'Felicidad':
+    if afecta == 'Felicidad':
         if porcentaje:
             if suma:
                 turno.Felicidad = turno.Felicidad + (turno.Felicidad * Decimal(cantidad))
@@ -409,6 +386,49 @@ def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
             return True
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
         return True
+    elif afecta == 'Ingresos':
+        turno.DineroEfectivo = turno.DineroEfectivo + cantidad
+    elif afecta == 'Egresos':
+        turno.DineroEfectivo = turno.DineroEfectivo - cantidad
+
+def turnoIngresosEgresos(user, turno):
+   
+    prestamos = Prestamo.objects.filter(User = user.id)
+    inversiones = Inversion.objects.filter(User = user.id)
+    ingresos = Afecta_user.objects.filter(Afecta = 'Ingresos', User = user.id)
+    egresos = Afecta_user.objects.filter(Afecta = 'Egresos', User = user.id)
+
+    turnoEgresos = 0
+    turnoIngresos = 0
+
+    for prestamo in prestamos:
+        turnoEgresos = turnoEgresos + prestamo.Mensualidad
+
+    for inversion in inversiones:
+        turnoIngresos = turnoIngresos + inversion.SaldoActual
+
+    for ingreso in ingresos:
+        portafolioCantidad = afectaMensual(ingreso)
+        turnoIngresos = turnoIngresos + portafolioCantidad
+
+    for egreso in egresos:
+        portafolioCantidad = afectaMensual(egreso)
+        turnoEgresos = turnoEgresos + portafolioCantidad
+
+        turno.update(Ingresos=turnoIngresos, Egresos=turnoEgresos)
+
+def afectaMensual(afecta):
+    if afecta.TurnosEsperar > 4:
+        numDividir = afecta.TurnosEsperar / 4
+        afectaCantidad = afecta.Cantidad / Decimal(numDividir)
+    elif afecta.TurnosEsperar == 2:
+        afectaCantidad = afecta.Cantidad * 2
+    elif afecta.TurnosEsperar == 1:
+        afectaCantidad = afecta.Cantidad * 4
+    else :
+        afectaCantidad = afecta.Cantidad
+    return afectaCantidad
+
 
 def prestamosTurnos(user, turno, prestamos):
 
@@ -623,6 +643,59 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.save()
         
         return JsonResponse({}, safe=False)
+
+###################################################################
+
+###################################################################
+class PortafolioViewSet(viewsets.ModelViewSet):
+
+    @action(methods=['get'], detail=False)
+    def financiero(self, request):
+        jsonPortafolio = request.data
+        user = User.objects.filter(id = jsonPortafolio['UserID']).first()
+
+        prestamos = Prestamo.objects.filter(User = user.id)
+        inversiones = Inversion.objects.filter(User = user.id)
+        ingresos = Afecta_user.objects.filter(Afecta = 'Ingresos', User = user.id)
+        egresos = Afecta_user.objects.filter(Afecta = 'Egresos', User = user.id)
+
+        portafolio = []
+
+        for prestamo in prestamos:
+            nombrePrestamo = TipoPrestamo.objects.filter(idPrestamo = prestamo.idPrestamo).first()
+            nombre = "Prestamo " + str(nombrePrestamo)
+            portafolio.append({"Tipo":"Egreso", "Nombre":nombre, "Cantidad":prestamo.Mensualidad, "Periodo":"Mensual"})
+
+        for inversion in inversiones:
+            compania = TipoInversiones.objects.filter(id=inversion.TipoInversion.id).first()
+            portafolio.append({"Tipo":"Ingreso", "Nombre":compania.Inversion, "Cantidad":inversion.SaldoActual, "Periodo":"Activo"})
+
+        for ingreso in ingresos:
+            periodo = Periodo.objects.filter(Turnos=ingreso.TurnosEsperar).first()
+            portafolio.append({"Tipo":"Ingreso", "Nombre":ingreso.Descripcion, "Cantidad":ingreso.Cantidad, "Periodo":periodo.TipoPeriodo})
+
+        for egreso in egresos:
+            periodo = Periodo.objects.filter(Turnos=egreso.TurnosEsperar).first()
+            portafolio.append({"Tipo":"Egreso", "Nombre":egreso.Descripcion, "Cantidad":egreso.Cantidad, "Periodo":periodo.TipoPeriodo})
+
+        return JsonResponse(portafolio, safe=False)
+
+    
+###################################################################
+
+###################################################################
+class FinJuegoViewSet(viewsets.ModelViewSet):
+
+    @action(methods=['put'], detail=False)
+    def juego(self, request):
+        jsonUser = request.data
+        user = User.objects.filter(id = jsonUser['UserID']).first()
+
+        user.delete()
+
+        return JsonResponse({}, safe=False)
+
+
 
 ###################################################################
 
