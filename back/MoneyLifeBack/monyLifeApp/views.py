@@ -11,7 +11,6 @@ from rest_framework.decorators import action
 from decimal import Decimal
 from rest_framework.renderers import JSONRenderer
 from django.http import JsonResponse
-
 import pandas as pd
 import numpy as np
 import random
@@ -75,10 +74,8 @@ def eventoAfecta(data):
             afecta_usuario = Afecta_user(User=user, Descripcion=evento.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
             afecta_usuario.save()
 
-def verificarRequisitos(id):
+def verificarRequisitos(id, turno):
     print('eventosRequisitosfunc')
-    user = User.objects.filter(id = 2).first() #Esto son pruebas con el usuario
-    turno = Turnos.objects.filter(User=user).first()
     requisitos = Evento_Requisitos.objects.filter(Evento = id)
     if not requisitos:
         return True
@@ -171,7 +168,7 @@ def verificarRequisitos(id):
                         return False
         return True
 
-def getSeleccion(queryset, tipoEvento, eventos):
+def getSeleccion(queryset, tipoEvento, eventos, turno):
     df = pd.DataFrame(list(queryset.values()))
     df['FrecuenciaAcumulada'] = df['Frecuencia'].cumsum()
     limite_inferior = df['FrecuenciaAcumulada'].min()
@@ -180,33 +177,44 @@ def getSeleccion(queryset, tipoEvento, eventos):
     for index, row in df.iterrows():
         if (row['FrecuenciaAcumulada'] >= seleccion):
             if(tipoEvento == 'Micro'):
-                if(verificarRequisitos(row['id'])):
-                    temp = row[['id','Descripcion']].to_dict()
+                if(verificarRequisitos(row['id'], turno)):
+                    desc = Evento.objects.get(id=row['id'])
+                    desc = str(desc.Descripcion)
+                    temp = row[['id']].to_dict()
                     temp['TipoEvento'] = 'Micro'
+                    temp['Descripcion'] = desc
                     eventos.append(temp)
                     break
                 else:
                     pass
             else:
-                temp = row[['id','Descripcion']].to_dict()
+                temp = row[['id']].to_dict()
+                desc = Evento.objects.get(id=row['id'])
+                desc = str(desc.Descripcion)
                 temp['TipoEvento'] = 'Macro'
+                temp['Descripcion'] = desc
                 eventos.append(temp)
                 break
 
+
 def seleccionEvento():
-    micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk        
+    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
+    turno = Turnos.objects.filter(User=user).first()
     eventos = []
-    query_micro = Evento.objects.filter(TipoEvento=micro_id)
     seleccion = 0
-    getSeleccion(query_micro, 'Micro', eventos)
+    eventosDisp = Evento_User.objects.values_list('Evento','Frecuencia','TipoEvento').exclude(Frecuencia=0)
+    for evento in eventosDisp:
+        print(evento)
+    micro_id = TipoEvento.objects.get(TipoEvento = 'Micro').pk
+    query_micro = eventosDisp.filter(TipoEvento=micro_id)
+    getSeleccion(query_micro, 'Micro', eventos, turno)
     seleccion = random.uniform(0,1)
     if(seleccion >= .7):
         macro_id = TipoEvento.objects.get(TipoEvento = 'Macro').pk
-        query_macro = Evento.objects.filter(TipoEvento=macro_id)
-        getSeleccion(query_macro, 'Macro', eventos)
+        query_macro = eventosDisp.filter(TipoEvento=macro_id)
+        getSeleccion(query_macro, 'Macro', eventos, turno)
     else:
-        eventos.append({}) 
-    
+        eventos.append({})
     return eventos
 
 ###################################################################
