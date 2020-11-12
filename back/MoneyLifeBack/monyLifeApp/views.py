@@ -216,7 +216,7 @@ class PreguntaViewSet(viewsets.ModelViewSet):
     queryset = Preguntas.objects.all()
     serializer_class = PreguntasSerializer
 
-    
+
 ###################################################################
 
 ###################################################################
@@ -227,22 +227,24 @@ class TurnosViewSet(viewsets.ModelViewSet):
     serializer_class = TurnosSerializer
 
     #Este servicio se manda cada que inicie el turno
-    @action(methods=['get', 'put'], detail=False)  #se necesita el usuario
+    @action(methods=['get'], detail=False)  #se necesita el usuario
     def inicio(self, request):
+        jsonTurno = request.data
+        user = User.objects.filter(id = jsonTurno["UserID"]).first()
+        turno = Turnos.objects.filter(User=user).first()
+        prestamos = Prestamo.objects.filter(User=user)
+        inversiones = Inversion.objects.filter(User=user)
 
-        #afectaTurnos() #Llama a todos los afecta que esten relacionados con el usuario y los aplica
-        prestamosTurnos() #Llama a todos los prestamos relacionados con este usuario para aplicar el gasto
-        #inversionesTurnos() #Llama a todas las inversiones relacionados con este usuario y aplica su flujo
+        afectaTurnos(user, turno) #Llama a todos los afecta que esten relacionados con el usuario y los aplica
+        prestamosTurnos(user, turno, prestamos) #Llama a todos los prestamos relacionados con este usuario para aplicar el gasto
+        inversionesTurnos(user, turno, inversiones) #Llama a todas las inversiones relacionados con este usuario y aplica su flujo
 
-        user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
 
 #Se aplican todos los afectas relacionados con el usuario
-def afectaTurnos():
-    user = User.objects.filter(id = 3).first() #Esto son pruebas con el usuario
-    turno = Turnos.objects.filter(User=user).first()
+def afectaTurnos(user, turno):
     
     afectaActions = Afecta_user.objects.filter(User=user)
     for afecta in afectaActions:
@@ -309,16 +311,11 @@ def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
         return True
 
-def prestamosTurnos():
-    user = User.objects.filter(id = 2).first() #Esto son pruebas con el usuario
-    turno = Turnos.objects.filter(User=user).first()
-    prestamos = Prestamo.objects.filter(User=user)
+def prestamosTurnos(user, turno, prestamos):
 
     for prestamo in prestamos:
-        print("prestamo=",prestamo)
         turno.DineroEfectivo = turno.DineroEfectivo - prestamo.Mensualidad
         tipoPrestamo = prestamo.idPrestamo
-        print(tipoPrestamo)
         
         tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = str(tipoPrestamo)).first()
 
@@ -338,6 +335,27 @@ def prestamosTurnos():
             prestamo.delete()
 
         turno.save()
+
+def inversionesTurnos(user, turno, inversiones):
+
+    for inversion in inversiones:
+
+        compania = TipoInversiones.objects.filter(id=inversion.TipoInversion.id).first()
+
+        rangoRendimiento = (compania.RangoRendimiento).split(" ")
+        limite_inferior = float(rangoRendimiento[0])
+        limite_superior = float(rangoRendimiento[2])
+        tasaRendimiento = random.uniform(limite_inferior,limite_superior)
+
+        if inversion.EventoExterno != 0:
+            inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.EventoExterno))
+            inversion.EventoExterno == 0
+
+        ###### ver el video del profe para entender bien como funciona ######
+        inversion.TasaRendimiento = tasaRendimiento
+        inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.TasaRendimiento))
+        inversion.save()
+
 
 ###################################################################
 

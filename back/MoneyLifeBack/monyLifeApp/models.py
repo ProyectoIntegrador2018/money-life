@@ -254,6 +254,7 @@ class Preguntas_User(models.Model):
     User = models.ForeignKey(User, on_delete=models.CASCADE)
     Pregunta = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
     Frecuencia = models.IntegerField()
+    TipoPreguntas = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE, verbose_name="Tipo Pregunta")
     
 
     class Meta:

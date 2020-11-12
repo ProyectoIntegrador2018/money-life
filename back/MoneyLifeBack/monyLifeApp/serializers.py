@@ -27,7 +27,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         #Crear relacion con todas las preguntas
         preguntas = Preguntas.objects.all()
         for pregu in preguntas:
-            user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia)
+            user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia, TipoPreguntas=pregu.TipoPreguntas)
             user_pregu.save()
         
         return user
