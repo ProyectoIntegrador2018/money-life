@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
 from rest_framework import routers
-from monyLifeApp import views
+from monyLifeApp import views, scripts
 from rest_framework.authtoken.views import ObtainAuthToken
 
 router = routers.DefaultRouter()
