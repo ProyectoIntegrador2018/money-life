@@ -212,6 +212,8 @@ class InversionPregunta(models.Model):
     Aportacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     SaldoActual = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     SaldoInvercion = models.CharField(max_length=30)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    Descripcion = models.CharField(max_length=200, null=True)
 
 #Crear la tabla PREGUNTAS y sus relaciones
 #---------------------------------------------------------------
