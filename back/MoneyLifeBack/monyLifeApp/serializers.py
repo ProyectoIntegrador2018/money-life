@@ -15,7 +15,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         print("Se creo usuario: ",user)
 
         #Crear turno actual del usuario
-        newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=10000, Ingresos=1000, Egresos=0, User=user)
+        newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=10000, Ingresos=1000, Egresos=0, Sueldo=10000, User=user)
         newTurno.save()
 
         #Crear relacion con todos los eventos
@@ -29,7 +29,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         for pregu in preguntas:
             user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia, TipoPreguntas=pregu.TipoPreguntas)
             user_pregu.save()
-        
+
+        #Crear afecta de sueldo
+        user_afecta = Afecta_user(Afecta="SueldoReal", Descripcion="Eres empleado", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=10000, Duracion=99999999)
+        user_afecta.save()
+
         return user
 
 class EventoSerializer(serializers.ModelSerializer):
@@ -40,7 +44,7 @@ class EventoSerializer(serializers.ModelSerializer):
 class TurnosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Turnos
-        fields = ['id','NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos']
+        fields = ['id','NumeroTurnos', 'Felicidad', 'DineroEfectivo', 'Ingresos', 'Egresos', 'Sueldo']
 
 class PrestamosSerializer(serializers.ModelSerializer):
     class Meta:
