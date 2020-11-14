@@ -191,10 +191,17 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         jsonPrestamo = request.data
 
         user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
+        turno = Turnos.objects.filter(User=user).first()
         prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
         
         if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
             return JsonResponse({"error": "El saldo absoluto es menos que la amortización"}, safe=False)
+        
+        if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
+            return JsonResponse({"error": "No tienes la cantidad requerida para esta accion"}, safe=False)
+
+        if jsonPrestamo["Amortizacion"] <= 0:
+            return JsonResponse({"error": "Cantidad no valida"}, safe=False)
 
         prestamo.AbonoCapital = jsonPrestamo["Amortizacion"] + prestamo.AbonoCapital
 
@@ -208,7 +215,10 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         if prestamo.SaldoAbsoluto <= 0:
             prestamo.delete()
         
-        return JsonResponse({}, safe=False)
+        turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonPrestamo["Amortizacion"])
+        turno.save()
+
+        return JsonResponse({"Bien":"Se realizo la amoritizacion de forma correcta"}, safe=False)
     
     @action(methods=['get'], detail=False)
     def prestamosActuales(self, request):
@@ -306,10 +316,16 @@ class InversionViewSet(viewsets.ModelViewSet):
     def agregarDinero(self, request):
 
         jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        turno = Turnos.objects.filter(User=user).first()
+
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
         
-        if jsonInversion["InversionID"] > turno.DineroEfectivo:
+        if jsonInversion["Cantidad"] > turno.DineroEfectivo:
             return JsonResponse({"error":"No cuentas con la cantidad de dinero para realizar esta accion"}, safe=False)
+
+        if jsonInversion["Cantidad"] <= 0:
+            return JsonResponse({"error":"Cantidad no valida"}, safe=False)
 
         inversion.SaldoAportacion = inversion.SaldoAportacion + jsonInversion["Cantidad"]
         inversion.SaldoActual = inversion.SaldoActual + jsonInversion["Cantidad"]
@@ -324,16 +340,24 @@ class InversionViewSet(viewsets.ModelViewSet):
     def retirarDinero(self, request):
         
         jsonInversion = request.data
+        user = User.objects.filter(id = jsonInversion['UserID']).first()
+        turno = Turnos.objects.filter(User=user).first()
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
 
         if jsonInversion["Cantidad"] >= inversion.SaldoActual:
             return JsonResponse({"error":"No cuentas con suficiente dinero para retirar esta cantidad"}, safe=False)
 
+        if jsonInversion["Cantidad"] <= 0:
+            return JsonResponse({"error":"Cantidad no valida"}, safe=False)
+
         inversion.Aportacion = inversion.Aportacion + jsonInversion["Cantidad"]
-        inversion.SaldoActual = inversion.SaldoActual - jsonInversion["Cantidad"]
+        inversion.SaldoActual = inversion.SaldoActual - Decimal(jsonInversion["Cantidad"])
         inversion.save()
+
+        turno.DineroEfectivo = turno.DineroEfectivo + Decimal(jsonInversion["Cantidad"])
+        turno.save()
         
-        return JsonResponse({}, safe=False)
+        return JsonResponse({"Bien": "La transaccion se realizo de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarAccion(self, request):
@@ -347,7 +371,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        return JsonResponse({}, safe=False)
+        return JsonResponse({"Bien": "Se retiro la accion de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarInversionPersonal(self, request):
@@ -361,7 +385,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        return JsonResponse({}, safe=False)
+        return JsonResponse({"Bien": "Se retiro la accion de forma correcta"}, safe=False)
 
 ###################################################################
 
