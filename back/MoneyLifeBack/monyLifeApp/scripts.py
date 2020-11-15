@@ -29,6 +29,15 @@ def eventoAfecta(user, eventos):
                         duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
                         afecta_usuario = Afecta_user(User=user, Descripcion=evento["Descripcion"], Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
                         afecta_usuario.save()
+"""
+def getAfectaEvento(response):
+    print(response[0])
+
+    for i in response:
+        if i != {}:
+            i['Afecta'] = []
+                afectas = Evento_Afecta.objects.filter()
+"""
 
 def verificarRequisitos(id, turno, flag_tipo):
     print('Requisitosfunc')

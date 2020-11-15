@@ -20,11 +20,21 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from monyLifeApp import scripts
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     #authentication_classes = {TokenAuthentication,}
     #permission_classes = {IsAuthenticated,}
+
+    @action(methods=['get'], detail=False)
+    def login(self, request):
+        userData = request.data
+        user = authenticate(username=userData['username'], password=userData['password'])
+        if user == None:
+            return JsonResponse({'error': "Usuario o contrasena incorrecta"}, safe = False)
+        return JsonResponse({'id': user.id}, safe = False)
+
 
 ###################################################################
 #LOGICA DE EVENTOS
@@ -32,6 +42,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
+    authentication_classes = {TokenAuthentication,}
+    permission_classes = {IsAuthenticated,}
 
     #Se llama al inicio del turno
     @action(methods=['get'], detail=False)
@@ -43,7 +55,9 @@ class EventoViewSet(viewsets.ModelViewSet):
         output = json.dumps(eventos)
         response = json.loads(output)
 
-        #scripts.modifyEvento(user, response) #Modifica la frcuencia del evento que se utilizo
+        #scripts.getAfectaEvento(response)
+
+        scripts.modifyEvento(user, response) #Modifica la frcuencia del evento que se utilizo
         scripts.eventoAfecta(user, response) #Crea los afecta del evento que se utilizo
 
         return JsonResponse(response, safe = False)
