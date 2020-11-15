@@ -101,7 +101,6 @@ class Evento_User(models.Model):
     TipoEvento = models.ForeignKey(TipoEvento, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = [['User','Evento']]
         verbose_name_plural = "Evento_User"
 
 #---------------------------------------------------------------
@@ -239,7 +238,6 @@ class Preguntas_Requisitos(models.Model):
     Cantidad = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        unique_together = [['Requisito','Preguntas']]
         verbose_name_plural = "Pregunta_Requisito"
 
 class Preguntas_Afecta(models.Model):
@@ -250,7 +248,6 @@ class Preguntas_Afecta(models.Model):
     Duracion = models.IntegerField()
 
     class Meta:
-        unique_together = [['Afecta','Preguntas']]
         verbose_name_plural = "Pregunta_Afecta"
 
 class Preguntas_User(models.Model):
@@ -280,6 +277,7 @@ class Turnos(models.Model):
     Preguntas = models.ForeignKey(Preguntas, null=True, on_delete = models.CASCADE) #Relacion con Preguntas
     Requisitos = models.ManyToManyField(Requisitos, null=True, through='Turnos_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, null=True, through='Turnos_Afecta') #Relacion con Afecta
+    Sueldo = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
 
     class Meta:
         verbose_name_plural = "Turnos"

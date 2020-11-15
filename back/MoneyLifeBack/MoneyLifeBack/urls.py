@@ -29,6 +29,7 @@ router.register(r'inversion', views.InversionViewSet, basename='inversion'),
 router.register(r'pregunta', views.PreguntaViewSet, basename='pregunta'),
 router.register(r'portafolio', views.PortafolioViewSet, basename='portafolio'),
 router.register(r'terminar', views.FinJuegoViewSet, basename='terminar'),
+router.register(r'terminar', views.FinJuegoViewSet, basename='terminar'),
 router.register(r'prueba', views.PruebaViewSet, basename='prueba')
 
 # Wire up our API using automatic URL routing.
