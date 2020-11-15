@@ -1,0 +1,4 @@
+<div class="alert" [ngClass]="{'simple': type === 'simple', 'success': type === 'success','danger': type === 'danger','warning': type === 'warning'}">
+    <h3>{{msg}}</h3>
+    <a class="close" (click)="erase()">&times;</a>
+</div>

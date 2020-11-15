@@ -1,0 +1,88 @@
+<svg width="120" height="120" viewBox="0 0 120 120" class="progress__svg">
+  <circle
+    [attr.r]="radius"
+    cx="60"
+    cy="60"
+    stroke-width="12"
+    class="progress__meter"
+  />
+  <circle
+    [style.strokeDasharray]="circumference"
+    [style.strokeDashoffset]="dashoffset"
+    [attr.r]="radius"
+    cx="60"
+    cy="60"
+    stroke-width="12"
+    class="progress__value"
+    [ngStyle]="{'stroke': colorProgress}"
+
+  />
+</svg>
+  
+<div class="minifigure">
+  <div class="head">
+    <div class="faces-wrap">
+      <div class="faces" [ngStyle]="setMyStyles()">
+
+        <div class="face classic">
+          <div class="eye right"></div>
+          <div class="eye left"></div>
+          <div class="mouth"></div>
+        </div>
+
+        <div class="face smile">
+          <div class="eye right">
+            <div class="brow"></div>
+          </div>
+          <div class="eye left">
+            <div class="brow"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <div class="face large-smile">
+          <div class="eye right">
+            <div class="brow"></div>
+          </div>
+          <div class="eye left">
+            <div class="brow"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <div class="face worried">
+          <div class="eye right">
+            <div class="brow"></div>
+          </div>
+          <div class="eye left">
+            <div class="brow"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <div class="face frown">
+          <div class="eye right">
+            <div class="brow"></div>
+          </div>
+          <div class="eye left">
+            <div class="brow"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+        <div class="face surprised">
+          <div class="eye right">
+            <div class="brow"></div>
+          </div>
+          <div class="eye left">
+            <div class="brow"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+  

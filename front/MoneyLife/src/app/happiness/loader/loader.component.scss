@@ -1,0 +1,358 @@
+.progress__svg {
+    transform: rotate(-90deg);
+}
+
+.progress__meter,
+.progress__value {
+  fill: none;
+}
+
+.progress__meter {
+  stroke: #ccc;
+}
+
+.progress__value {
+  // stroke: #4caf50;
+  transition: all;
+}
+
+.minifigure {
+  top: 0;
+  left: 61px;
+  perspective: 200;
+  position: absolute;
+  transition: transform 400ms;
+  transform-style: preserve-3d;
+}
+
+.minifigure.explode {
+  transform: scale(0.75) translateZ(0);
+}
+
+/* Head */
+
+.head {
+  z-index: 1;
+  top: 143px;
+  left: 10px;
+  width: 7.25em;
+  height: 6.25em;
+  position: absolute;
+  border-radius: 1.5em;
+  transform: translateX(-50%);
+  transition: transform 400ms;
+}
+
+.head {
+  transform: translate(-50%, -8em);
+}
+
+/* Faces */
+
+.faces-wrap {
+  height: 100%;
+  overflow: hidden;
+}
+
+.faces {
+  display: flex;
+  transform: translateX(0%);
+  transition: transform 400ms cubic-bezier(0,0,0,1.25);
+}
+
+.face {
+  flex: 1 0 100%;
+  position: relative;
+}
+
+/* Eyes */
+
+.eye {
+  top: 2.25em;
+  width: 0.75em;
+  color: #fff;
+  height: 0.9375em;
+  position: absolute;
+  background-color: currentColor;
+  border-radius: 50%;
+  box-shadow: inset 0 -0.125em 0 0.25em #000;
+}
+
+.eye::before {
+  content: '';
+  left: 50%;
+  color: #000;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.eye.right {
+  left: 2.25em;
+}
+
+.eye.left {
+  right: 2.25em;
+}
+
+.classic .eye {
+  color: #000;
+  top: 2.4375em;
+  height: 0.75em;
+  box-shadow: none;
+}
+
+.large-smile .eye {
+  top: 2em;
+}
+
+.worried .eye,
+.surprised .eye {
+  width: 1em;
+  top: 2.4375em;
+  height: 1.125em;
+  box-shadow: inset 0 -0.125em 0 0.3125em #000;
+}
+
+.worried .eye.right {
+  left: 2.125em;
+}
+
+.worried .eye.left {
+  right: 2.125em;
+}
+
+.frown .eye {
+  top: 2.625em;
+}
+
+.frown .eye::before {
+  bottom: 80%;
+  height: 1em;
+  width: 1.25em;
+  border-radius: 50%;
+  border: 0.1875em solid transparent;
+  border-bottom-color: currentColor;
+}
+
+.frown .eye.right::before {
+  margin-left: -0.25em;
+  transform: translateX(-50%) rotate(-20deg);
+}
+
+.frown .eye.left::before {
+  margin-left: 0.25em;
+  transform: translateX(-50%) rotate(20deg);
+}
+
+/* Brow */
+
+.brow {
+  left: 50%;
+  height: 1em;
+  color: #000;
+  width: 1.75em;
+  bottom: 0.625em;
+  position: absolute;
+  border-bottom: none;
+  transform-origin: 0 0;
+  border-radius: 50% 50% 0 0;
+  transform: translateX(-50%);
+  border-top-color: currentColor;
+  border: 0.25em solid transparent;
+}
+
+.right .brow {
+  border-left: none;
+}
+
+.left .brow {
+  border-right: none;
+}
+
+.large-smile .brow {
+  border: none;
+  width: 1.25em;
+  height: 1.375em;
+  bottom: 0.375em;
+  border-top: 0.25em solid;
+  border-radius: 50% 50% 0 0;
+}
+
+.large-smile .right .brow {
+  margin-left: -0.125em;
+  transform: skewY(-10deg) translateX(-50%) translateZ(0);
+}
+
+.large-smile .left .brow {
+  margin-left: 0.125em;
+  transform: skewY(10deg) translateX(-50%) translateZ(0);
+}
+
+.worried .brow {
+  width: 1.25em;
+  height: 0.875em;
+  bottom: 1.25em;
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+  border-bottom: 0.25em solid currentColor;
+}
+
+.worried .right .brow {
+  margin-left: -0.25em;
+  transform: rotate(-20deg) translateX(-50%) translateZ(0);
+}
+
+.worried .left .brow {
+  margin-left: 0.25em;
+  transform: rotate(20deg) translateX(-50%) translateZ(0);
+}
+
+.frown .brow {
+  width: 1.5em;
+  bottom: 1.375em;
+  border-top: none;
+  border-radius: 0 0 50% 50%;
+  border-bottom: 0.25em solid currentColor;
+}
+
+.frown .right .brow {
+  margin-left: -0.625em;
+  transform: rotate(-35deg) translateX(-50%) translateZ(0);
+}
+
+.frown .left .brow {
+  margin-left: 0.625em;
+  transform: rotate(35deg) translateX(-50%) translateZ(0);
+}
+
+.surprised .brow {
+  bottom: 1em;
+  width: 1.5em;
+  border-left: none;
+  border-right: none;
+}
+
+.surprised .right .brow {
+  margin-left: -0.5em;
+  transform: rotate(-15deg) translateX(-50%) translateZ(0);
+}
+
+.surprised .left .brow {
+  margin-left: 0.5em;
+  transform: rotate(15deg) translateX(-50%) translateZ(0);
+}
+
+/* Mouth */
+
+.mouth {
+  left: 50%;
+  top: 3.125em;
+  width: 2.5em;
+  color: #000;
+  height: 1.5em;
+  position: absolute;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  border: 0.25em solid transparent;
+  border-bottom-color: currentColor;
+}
+
+.mouth::before,
+.mouth::after {
+  content: '';
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.classic .mouth {
+  top: 2.9375em;
+}
+
+.large-smile .mouth {
+  top: 0;
+  height: 4em;
+  border: none;
+  width: 3.6em;
+  border-bottom: 1.5em solid;
+  border-radius: 0 0 70% 70%/0 0 50% 50%;
+}
+
+.large-smile .mouth::before {
+  height: 2em;
+  top: 1.6875em;
+  width: 4.25em;
+  color: #000;
+  border-radius: 0 0 50% 50%;
+  border-bottom-color: currentColor;
+  border: 0.1875em solid transparent;
+  box-shadow: 0 0.9375em 0 -0.75em #fff;
+}
+
+.worried .mouth {
+  top: 4.5em;
+  width: 2em;
+  height: 1.25em;
+  border-right: none;
+  border-right-width: 0.5em;
+  border-radius: 50% 50% 0 0;
+  border-top-color: currentColor;
+  border-bottom-color: transparent;
+  transform: translateX(-50%) rotate(-10deg) translateZ(0);
+}
+
+.frown .mouth {
+  top: 4.25em;
+  height: 2em;
+  width: 2.75em;
+  border-right: none;
+  margin-left: -0.125em;
+  border-right-width: 0.5em;
+  border-radius: 50% 50% 0 0;
+  border-top-color: currentColor;
+  border-bottom-color: transparent;
+  transform: translateX(-50%) rotate(-15deg) translateZ(0);
+}
+
+.frown .mouth::before {
+  top: 0.375em;
+  width: 0.75em;
+  color: #000;
+  height: 0.625em;
+  border-right: none;
+  border-radius: 50%;
+  margin-left: 0.125em;
+  border-radius: 50% 50% 0 0;
+  border-top-color: currentColor;
+  border: 0.125em solid transparent;
+}
+
+.surprised .mouth {
+  top: 4em;
+  border: none;
+  width: 3.125em;
+  height: 1.625em;
+  background-color: currentColor;
+  border-radius: 70% 70% 60% 60%/100% 100% 50% 50%;
+}
+
+.surprised .mouth::before,
+.surprised .mouth::after {
+  color: #fff;
+  background-color: currentColor;
+}
+
+.surprised .mouth::before {
+  top: 0.1875em;
+  width: 2em;
+  height: 0.375em;
+  border-radius: 70% 70% 60% 60%/100% 100% 50% 50%;
+}
+
+.surprised .mouth::after {
+  width: 2.25em;
+  height: 0.375em;
+  bottom: 0.1875em;
+  border-radius: 70% 70% 60% 60%/100% 100% 50% 50%;
+}
+

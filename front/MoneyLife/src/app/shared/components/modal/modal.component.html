@@ -1,0 +1,78 @@
+<div class="body" [ngClass]="{'modal-active': open}">
+    <div id="modal-container" [ngClass]="{'effect': open, 'out': !open}">
+        <div class="modal-background">
+            <div class="modal">
+                <div class="content">
+                    <div class="modal-body"> 
+                        <div class="wrap">
+                      
+                          <ul class="tabs group">
+                            <li *ngFor="let title of titles"><a [ngClass]="{'active': title.active}" (click)="changeTab(title)" class="title">{{title.name}}</a></li>
+                          </ul>
+                          
+                          <div id="content"> <!-- TODO: NgFor-->
+                            <div class="wave -one"></div>
+                            <div class="wave -two"></div>
+                            <div class="wave -three"></div>
+                            <div class="text">
+                              <ng-container [ngSwitch]="activeSwitch.internalName">
+                                <ng-container *ngSwitchCase="'portfolio'">
+                                  <ng-container *ngTemplateOutlet="portfolio"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'newActions'">
+                                  <ng-container *ngTemplateOutlet="newActions"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'newLoan'">
+                                  <ng-container *ngTemplateOutlet="newLoan"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'myActions'">
+                                  <ng-container *ngTemplateOutlet="myActions"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'myLoans'">
+                                  <ng-container *ngTemplateOutlet="myLoans"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'questions'">
+                                  <ng-container *ngTemplateOutlet="questions"></ng-container>
+                                </ng-container>
+                              </ng-container>
+                            </div>
+                            <div class="controls">
+                              <p id="accept" (click)="closeModal()">Aceptar</p>
+                            </div>
+                          </div>
+                    
+                        </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #portfolio>
+  <p>Nuevo Préstamos</p>
+</ng-template>
+<ng-template #newActions>
+  <ng-container *ngIf="activeSwitch.position === 0">
+    <p>Nuevas accions pagina 1</p>
+  </ng-container>
+  <ng-container *ngIf="activeSwitch.position === 1">
+    <p>Nuevas accions pagina 2</p>
+  </ng-container>
+</ng-template>
+
+<ng-template #newLoan>
+  <p>Nuevo Préstamos</p>
+</ng-template>
+
+<ng-template #myActions>
+  <p>Mis Acciones </p>
+</ng-template>
+
+<ng-template #myLoans>
+  <p>Mis Acciones </p>
+</ng-template>
+
+<ng-template #questions>
+  <p>Descripción </p>
+</ng-template>
+
