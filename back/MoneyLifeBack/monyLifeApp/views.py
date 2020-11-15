@@ -29,6 +29,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def login(self, request):
+        print("ENTRO A GET LOGIN")
         userData = request.data
         user = authenticate(username=userData['username'], password=userData['password'])
         if user == None:
@@ -92,6 +93,8 @@ class PreguntaViewSet(viewsets.ModelViewSet):
             for afecta in afectasPregunta:
                 print("prueba ",afecta.Afecta)
             scripts.afectaTurnosPregunta(afectasPregunta, turno)
+        else:
+            return JsonResponse({"error":"No cuentas con los requisitos necesarios para esta accion"}, safe=False)
 
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
