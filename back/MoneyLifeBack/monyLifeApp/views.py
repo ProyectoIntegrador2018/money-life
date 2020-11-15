@@ -42,8 +42,6 @@ class UserViewSet(viewsets.ModelViewSet):
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    authentication_classes = {TokenAuthentication,}
-    permission_classes = {IsAuthenticated,}
 
     #Se llama al inicio del turno
     @action(methods=['get'], detail=False)
