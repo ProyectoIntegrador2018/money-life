@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiEndPoint:'',
-  apiEndPointTest: 'https://b4a7a3d1c48e.ngrok.io/'
+  apiEndPointTest: 'http://localhost:8080'
 };
 
 /*

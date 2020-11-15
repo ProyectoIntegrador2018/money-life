@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { LoginService } from '../services/login.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { User } from '../interfaces/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +20,10 @@ export class LoginComponent implements OnInit {
   errorPassNew = false;
   errorPassNew2 = false;
   errorRecover = false;
-  constructor() { }
+  constructor(
+    private loginService: LoginService,
+    private router: Router
+    ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -25,7 +31,7 @@ export class LoginComponent implements OnInit {
   }
   initForm(): void {
     this.logInForm = new FormGroup({
-      user: new FormControl('', [
+      username: new FormControl('', [
         Validators.required,
         Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')
       ]),
@@ -33,14 +39,15 @@ export class LoginComponent implements OnInit {
       [Validators.required])
     });
     this.registerForm = new FormGroup({
-      newUser: new FormControl('', [
+      username: new FormControl('', [
         Validators.required,
         Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')
       ]),
-      newPassword: new FormControl('', [
+      password: new FormControl('', [
         Validators.required]),
-      newPassword2: new FormControl('',[
-        Validators.required]),
+      password2: new FormControl('',[
+        Validators.required],
+        ),
     });
     this.recoverForm = new FormGroup({
       recoverEmail: new FormControl('', [
@@ -50,9 +57,16 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.logInForm.status);
     if (this.logInForm.status === 'VALID') {
-      // TODO: call services to make log in
+      this.loginService.login(this.logInForm.value).subscribe(
+        resp => {
+          console.log(resp);
+          localStorage.setItem('userID', resp.id);
+          this.router.navigateByUrl("/game");
+        }, error => {
+          //TODO: Alert error
+        }
+      );
     } else {
       if (this.logInForm.controls.user.status === 'INVALID') {
         this.errorUser = true;
@@ -63,18 +77,33 @@ export class LoginComponent implements OnInit {
     }
   }
   onSubmitRegister(): void {
-    if (this.registerForm.status === 'VALID') {
-      // TODO: call services to make registration
+    if (this.registerForm.controls.password.value === this.registerForm.controls.password2.value) {
+      if (this.registerForm.status === 'VALID') {
+        this.loginService.register(this.registerForm.value).subscribe(
+          resp => {
+            const user: User = resp as User;
+            console.log(user);
+            localStorage.setItem('userID', user.id.toString());
+            localStorage.setItem('username', user.id.toString());
+            this.router.navigateByUrl("/game");
+          }, error => {
+            // TODO Alert error
+          }
+        );
+      } else {
+        if (this.registerForm.controls.username.status === 'INVALID') {
+          this.errorUserNew = true;
+        }
+        if (this.registerForm.controls.password.status === 'INVALID') {
+          this.errorPassNew = true;
+        }
+        if (this.registerForm.controls.password2.status === 'INVALID') {
+          this.errorPassNew2 = true;
+        }
+      }
     } else {
-      if (this.registerForm.controls.newUser.status === 'INVALID') {
-        this.errorUserNew = true;
-      }
-      if (this.registerForm.controls.newPassword.status === 'INVALID') {
-        this.errorPassNew = true;
-      }
-      if (this.registerForm.controls.newPassword2.status === 'INVALID') {
-        this.errorPassNew2 = true;
-      }
+      this.errorPassNew = true;
+      this.errorPassNew2 = true;
     }
   }
   onSubmitRecover(): void {
