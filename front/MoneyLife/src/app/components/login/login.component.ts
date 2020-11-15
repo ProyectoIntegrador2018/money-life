@@ -7,7 +7,8 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [LoginService]  //Provedor login
 })
 export class LoginComponent implements OnInit {
   action = 'login';
@@ -27,7 +28,14 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    
+    this.register = {
+      username: '',
+      password: '' 
+    };
+    this.inputLogin = {
+      username: '',
+      password: ''  
+    };
   }
   initForm(): void {
     this.logInForm = new FormGroup({

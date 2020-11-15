@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import *
 # Register your models here.
 
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
 
 class RequisitosAdmin(admin.ModelAdmin):
     list_display=("TipoRequisito",)
@@ -36,7 +38,7 @@ class TipoEventoAdmin(admin.ModelAdmin):
     search_fields=("TipoEvento",)
 
 class PreguntasAdmin(admin.ModelAdmin):
-    list_display=("Descripcion","Probabilidad", "TipoPreguntas")
+    list_display=("Descripcion","Frecuencia", "TipoPreguntas")
     search_fields=("Descripcion",)
     list_filter=("TipoPreguntas",)
     exclude = ('User',)

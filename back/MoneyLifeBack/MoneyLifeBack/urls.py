@@ -15,7 +15,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include, path
+from rest_framework import routers
+from monyLifeApp import views, scripts
+from rest_framework.authtoken.views import ObtainAuthToken
 
+router = routers.DefaultRouter()
+router.register(r'users', views.UserViewSet),
+router.register(r'evento', views.EventoViewSet, basename='evento'),
+router.register(r'turno', views.TurnosViewSet, basename='turno'),
+router.register(r'prestamo', views.PrestamoViewSet, basename='prestamo'),
+router.register(r'inversion', views.InversionViewSet, basename='inversion'),
+router.register(r'pregunta', views.PreguntaViewSet, basename='pregunta'),
+router.register(r'portafolio', views.PortafolioViewSet, basename='portafolio'),
+router.register(r'terminar', views.FinJuegoViewSet, basename='terminar'),
+router.register(r'terminar', views.FinJuegoViewSet, basename='terminar'),
+router.register(r'prueba', views.PruebaViewSet, basename='prueba')
+
+# Wire up our API using automatic URL routing.
+# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include(router.urls)),
+    path('api-auth/', ObtainAuthToken.as_view())
 ]

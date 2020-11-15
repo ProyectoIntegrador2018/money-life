@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -31,15 +31,6 @@ class Afecta(models.Model):
     def __str__(self):
         return self.TipoAfect
 
-#Crear la tabla Usuario
-class User(models.Model):
-    RolUsuario = models.CharField(max_length=30)
-
-    class Meta:
-        verbose_name_plural = "Usuario"
-
-    def __str__(self):
-        return self.RolUsuario
 
 #Crear tabla Periodo
 class Periodo(models.Model):
@@ -69,10 +60,9 @@ class TipoEvento(models.Model):
 class Evento(models.Model):
     Descripcion = models.CharField(max_length=200)
     Frecuencia = models.IntegerField()
-    Probabilidad = models.DecimalField(max_digits=20,  decimal_places=2)
     Requisitos = models.ManyToManyField(Requisitos, through='Evento_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Evento_Afecta') #Relacion con Afecta
-    User = models.ForeignKey(User, blank=True, null=True, on_delete = models.SET_NULL) #Relacion con User
+    User = models.ManyToManyField(User, through='Evento_User')
     TipoEvento = models.ForeignKey(TipoEvento,blank=True, null=True, on_delete = models.SET_NULL, verbose_name="Tipo Evento") #Relacion con TipoEvento
 
     class Meta:
@@ -102,6 +92,16 @@ class Evento_Afecta(models.Model):
     class Meta:
         unique_together = [['Afecta','Evento']]
         verbose_name_plural = "Evento_Afecta"
+
+#Tabla relacion Evento con Usuario
+class Evento_User(models.Model):
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    Evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    Frecuencia = models.IntegerField()
+    TipoEvento = models.ForeignKey(TipoEvento, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "Evento_User"
 
 #---------------------------------------------------------------
 #Crear la tabla Tipo Inversion
@@ -160,6 +160,7 @@ class Prestamo(models.Model):
     ValorTotal = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     CantidadPrestada = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Enganche = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Frecuencia = models.IntegerField()
     Amortizacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Interes = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Mensualidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
@@ -210,6 +211,8 @@ class InversionPregunta(models.Model):
     Aportacion = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     SaldoActual = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     SaldoInvercion = models.CharField(max_length=30)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    Descripcion = models.CharField(max_length=200, null=True)
 
 #Crear la tabla PREGUNTAS y sus relaciones
 #---------------------------------------------------------------
@@ -217,10 +220,10 @@ class InversionPregunta(models.Model):
 #Crear tabla Preguntas
 class Preguntas(models.Model):
     Descripcion = models.CharField(max_length=200)
-    Probabilidad = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
+    Frecuencia = models.IntegerField()
     Requisitos = models.ManyToManyField(Requisitos, through='Preguntas_Requisitos') #Relacion con Requisitos
     Afecta = models.ManyToManyField(Afecta, through='Preguntas_Afecta') #Relacion con Afecta
-    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
+    User = models.ManyToManyField(User, through='Preguntas_User') #Relacion con User
     TipoPreguntas = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE, verbose_name="Tipo Pregunta") #Relacion con TipoPreguntas
 
     class Meta:
@@ -235,7 +238,6 @@ class Preguntas_Requisitos(models.Model):
     Cantidad = models.CharField(max_length=40, blank=True, null=True)
 
     class Meta:
-        unique_together = [['Requisito','Preguntas']]
         verbose_name_plural = "Pregunta_Requisito"
 
 class Preguntas_Afecta(models.Model):
@@ -246,8 +248,18 @@ class Preguntas_Afecta(models.Model):
     Duracion = models.IntegerField()
 
     class Meta:
-        unique_together = [['Afecta','Preguntas']]
         verbose_name_plural = "Pregunta_Afecta"
+
+class Preguntas_User(models.Model):
+    User = models.ForeignKey(User, on_delete=models.CASCADE)
+    Pregunta = models.ForeignKey(Preguntas, on_delete=models.CASCADE)
+    Frecuencia = models.IntegerField()
+    TipoPreguntas = models.ForeignKey(TipoPregunta, on_delete = models.CASCADE, verbose_name="Tipo Pregunta")
+    
+
+    class Meta:
+        unique_together = [['User','Pregunta']]
+        verbose_name_plural = "Preguntas_User"
 
 #---------------------------------------------------------------
 
@@ -258,13 +270,14 @@ class Turnos(models.Model):
     DineroEfectivo = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Ingresos = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
     Egresos = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
-    Edad = models.IntegerField()
-    Sexo = models.CharField(max_length=10)
-    User = models.ForeignKey(User, null=True, on_delete = models.SET_NULL) #Relacion con User
-    Evento = models.ForeignKey(Evento, on_delete = models.CASCADE) #Relacion con Evento
-    Preguntas = models.ForeignKey(Preguntas, on_delete = models.CASCADE) #Relacion con Preguntas
-    Requisitos = models.ManyToManyField(Requisitos, through='Turnos_Requisitos') #Relacion con Requisitos
-    Afecta = models.ManyToManyField(Afecta, through='Turnos_Afecta') #Relacion con Afecta
+    Edad = models.IntegerField(null=True)
+    Sexo = models.CharField(null=True, max_length=10)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    Evento = models.ForeignKey(Evento, null=True, on_delete = models.CASCADE) #Relacion con Evento
+    Preguntas = models.ForeignKey(Preguntas, null=True, on_delete = models.CASCADE) #Relacion con Preguntas
+    Requisitos = models.ManyToManyField(Requisitos, null=True, through='Turnos_Requisitos') #Relacion con Requisitos
+    Afecta = models.ManyToManyField(Afecta, null=True, through='Turnos_Afecta') #Relacion con Afecta
+    Sueldo = models.DecimalField(blank=True, null=True, max_digits=20,  decimal_places=2)
 
     class Meta:
         verbose_name_plural = "Turnos"
@@ -291,6 +304,11 @@ class Turnos_Afecta(models.Model):
         verbose_name_plural = "Turno_Requisito"
 
 
-
-
-
+class Afecta_user(models.Model):
+    Afecta = models.CharField(max_length=50)
+    Descripcion = models.CharField(max_length=150)
+    User = models.ForeignKey(User, null=True, on_delete = models.CASCADE) #Relacion con User
+    TurnosEsperar = models.IntegerField()
+    TurnosRestante = models.IntegerField()
+    Cantidad = models.CharField(max_length=50)
+    Duracion = models.IntegerField()
