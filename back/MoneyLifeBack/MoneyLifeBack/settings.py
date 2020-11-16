@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 's-yi$jhyeg&vwkbp@9z7uxup#gm%)df!-8e=nwropm2@ber8&o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -60,11 +60,12 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     #'django.middleware.common.CommonMiddleware',
 ]
-"""
-CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_ALL_ORIGINS = True
-"""
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = False
+
+
 
 ROOT_URLCONF = 'MoneyLifeBack.urls'
 
@@ -93,11 +94,11 @@ WSGI_APPLICATION = 'MoneyLifeBack.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'MoneyDB',
-        'USER': 'moneylifeuser',
-        'PASSWORD': 'moneylifeuser#',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'moneydb',
+        'USER': 'moneylifeuser@moneylifedbserver',
+        'PASSWORD': '%jmnn6@L5[)FxP-z',
+        'HOST': 'moneylifedbserver.mysql.database.azure.com',
+        'PORT': '3306',
 
     }
 }
@@ -139,11 +140,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
+
 STATIC_URL = '/static/'
+STATIC_ROOT = '/code/static/'
 
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
