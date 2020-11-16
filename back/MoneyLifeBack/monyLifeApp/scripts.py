@@ -305,10 +305,10 @@ def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
                 desc = Preguntas.objects.get(id=row['Pregunta_id'])
                 desc = str(desc.Descripcion)
                 descTipo = TipoPregunta.objects.get(id=row['TipoPreguntas_id'])
-                descTipo = str(descTipo.TipoPregunta)
+                descTipo = str(descTipo.TipoPregunta).split('_')[0]
                 temp = row[['Pregunta_id']].to_dict()
                 temp['Descripcion'] = desc
-                temp['TipoEvento'] = descTipo
+                temp['TipoPregunta'] = descTipo
                 preguntas.append(temp)
                 borrar = index
                 print(row['Pregunta_id'])
