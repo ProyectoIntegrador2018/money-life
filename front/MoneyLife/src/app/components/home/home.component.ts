@@ -147,11 +147,11 @@ export class HomeComponent implements OnInit {
     // this.selectedAction(); // string Bien or error
     // this.catalogueLoan(); // Loan
     // this.selectedLoan(); // String Bien or error
-    // this.myInvestments(); //MyInvestments
+    this.myInvestments(); //MyInvestments
     // this.investMoreMoney(); // string Bien or error
     // this.getMoneyfromAction(); // string error
     // this.sellAction(); // string Bien or error
-    // this.getOwnInvestment(); // PersonalInvestments
+    this.getOwnInvestment(); // PersonalInvestments
     // this.sellOwnInvestments(); // string Bien or error
     // this.seeMyLoans(); // MyLoans
     // this.reduceLoan(); // string error or Bien
@@ -173,7 +173,7 @@ export class HomeComponent implements OnInit {
     });
     this.questionsService.initTurnQuestions().subscribe(
       resp => {
-        // console.log(resp);
+        console.log(resp);
         this.questionsInv = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Inversion');
         this.questionsGoods = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Bienes Personales'); 
         this.questionsFun = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Diversion'); 
@@ -240,6 +240,7 @@ export class HomeComponent implements OnInit {
   myInvestments(): void {
     this.actionService.myActions().subscribe(
       resp => {
+        // console.log(resp);
         this.myInv = resp; 
       }, error => {
         //TODO: alert
@@ -277,6 +278,7 @@ export class HomeComponent implements OnInit {
     this.actionService.myOwnInvestmentFromQuestions().subscribe(
       resp => {
         this.personalInvestments = resp;
+        console.log(resp);
       }, error => {
         //TODO: alert
       }
@@ -340,6 +342,12 @@ export class HomeComponent implements OnInit {
         this.dataTitle = this.newLoan;
         break;
       case 'myActions':
+        this.myInvestments();
+        this.getOwnInvestment();
+        this.dataModal = [{
+          shared: this.myInv,
+          own: this.personalInvestments
+        }]
         this.dataTitle = this.myActions;
         break;
       case 'myLoans':

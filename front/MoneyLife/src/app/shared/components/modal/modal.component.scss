@@ -219,22 +219,24 @@
             height: 100%;
             display: flex;
             position: absolute;
-            table {
-              background: transparent;
-            }
-            table,thead,tbody,tfoot,tr, td,th {
-              text-align: center;
-              margin: auto;
-              border:1px solid #dedede;
-              background: transparent;
-              padding: 1rem;
-              width: 50%;
-            }
-            .aa_htmlTable{
-              width: auto;
-              height: auto;
-              margin: auto;
-            }
+          }
+          table {
+            background: transparent;
+          }
+          table,thead,tbody,tfoot,tr, td,th {
+            text-align: center;
+            margin: auto;
+            border:1px solid #dedede;
+            background: transparent;
+            padding: 1rem;
+            width: 50%;
+          }
+          .aa_htmlTable{
+            z-index: 1;
+            width: auto;
+            height: auto;
+            margin: auto;
+            position: relative;
           }
         }
         .controls {

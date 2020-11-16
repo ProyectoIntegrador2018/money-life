@@ -96,10 +96,50 @@
 </ng-template>
 <ng-template #newActions>
   <ng-container *ngIf="activeSwitch.position === 0">
-    <p>Nuevas accions pagina 1</p>
+    <div class="aa_htmlTable">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre de inversion</th>
+            <th>Tipo empresa</th>
+            <th>Aportación</th>
+            <th>Saldo inicial</th>
+            <th>Saldo actual</th>
+            <th>Saldo aportación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of data[0].shared">
+            <td>{{d.NombreInversion}}</td>
+            <td>{{d.TipoEmpresa}}</td>
+            <td>{{d.Aportacion}}</td>
+            <td>{{d.SaldoInicial}}</td>
+            <td>{{d.SaldoActual}}</td>
+            <td>{{d.SaldoAportacion}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </ng-container>
   <ng-container *ngIf="activeSwitch.position === 1">
-    <p>Nuevas accions pagina 2</p>
+    <div class="aa_htmlTable">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo de inversion</th>
+            <th>Inicio</th>
+            <th>Actual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of data[0].own">
+            <td>{{d.TipoInversion}}</td>
+            <td>{{d.Inicio}}</td>
+            <td>{{d.Actual}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </ng-container>
 </ng-template>
 
