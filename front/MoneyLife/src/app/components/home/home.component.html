@@ -4,7 +4,7 @@
     <div class="wave"></div>
   </div>
 </div>
-<app-modal *ngIf="openModal" (cancelModal)="cancelModal()" (close)="modalData($event)" [open]="openModal" [titles]="dataTitle" [data]="dataModal"></app-modal>
+<app-modal *ngIf="openModal" (cancelModal)="cancelModal()" (close)="modalActions($event)" [open]="openModal" [titles]="dataTitle" [data]="dataModal"></app-modal>
 <div class="header">
   <app-loader *ngIf="turn" [value]='turn.Felicidad'></app-loader>
   <app-event-notification *ngIf="show && eventMicro" [msg]="eventMicro.Descripcion" [type]="'simple'" (close)="close($event)" ></app-event-notification>

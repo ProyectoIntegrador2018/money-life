@@ -14,28 +14,26 @@
                             <div class="wave -one"></div>
                             <div class="wave -two"></div>
                             <div class="wave -three"></div>
-                            <div class="text">
-                              <ng-container [ngSwitch]="activeSwitch.internalName">
-                                <ng-container *ngSwitchCase="'portfolio'">
-                                  <ng-container *ngTemplateOutlet="portfolio"></ng-container>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'newActions'">
-                                  <ng-container *ngTemplateOutlet="newActions"></ng-container>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'newLoan'">
-                                  <ng-container *ngTemplateOutlet="newLoan"></ng-container>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'myActions'">
-                                  <ng-container *ngTemplateOutlet="myActions"></ng-container>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'myLoans'">
-                                  <ng-container *ngTemplateOutlet="myLoans"></ng-container>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'questions'">
-                                  <ng-container *ngTemplateOutlet="questions"></ng-container>
-                                </ng-container>
+                            <ng-container [ngSwitch]="activeSwitch.internalName">
+                              <ng-container *ngSwitchCase="'portfolio'">
+                                <ng-container *ngTemplateOutlet="portfolio"></ng-container>
                               </ng-container>
-                            </div>
+                              <ng-container *ngSwitchCase="'newActions'">
+                                <ng-container *ngTemplateOutlet="newActions"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'newLoan'">
+                                <ng-container *ngTemplateOutlet="newLoan"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'myActions'">
+                                <ng-container *ngTemplateOutlet="myActions"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'myLoans'">
+                                <ng-container *ngTemplateOutlet="myLoans"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'questions'">
+                                <ng-container *ngTemplateOutlet="questions"></ng-container>
+                              </ng-container>
+                            </ng-container>
                             <div class="controls">
                               <p id="accept" (click)="cancelModalFunc()">Cancelar</p>
                               <p id="accept" (click)="closeModal()">Aceptar</p>
@@ -50,7 +48,51 @@
     </div>
 </div>
 <ng-template #portfolio>
-  <p>Nuevo Préstamos</p>
+  <div class="portfolio">
+    <div class="side">
+      <div class="title">Ingresos</div>
+      <div class="aa_htmlTable">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Periodo</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of data.Ingresos">
+              <td>{{d.Nombre}}</td>
+              <td>{{d.Periodo}}</td>
+              <td>{{d.Cantidad}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="title">Egresos</div>
+      <div class="aa_htmlTable">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Periodo</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of data.Egresos">
+              <td>{{d.Nombre}}</td>
+              <td>{{d.Periodo}}</td>
+              <td>{{d.Cantidad}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>  
 </ng-template>
 <ng-template #newActions>
   <ng-container *ngIf="activeSwitch.position === 0">
@@ -62,18 +104,26 @@
 </ng-template>
 
 <ng-template #newLoan>
-  <p>Nuevo Préstamos</p>
+  <div class="text">
+    <p>Nuevo Préstamos</p>
+  </div>
 </ng-template>
 
 <ng-template #myActions>
-  <p>Mis Acciones </p>
+  <div class="text">
+    <p>Mis Acciones </p>
+  </div>
 </ng-template>
 
 <ng-template #myLoans>
-  <p>Mis Acciones </p>
+  <div class="text">
+    <p>Mis Acciones </p>
+  </div>
 </ng-template>
 
 <ng-template #questions>
-  <p>{{data[0].Descripcion}}</p>
+  <div class="text">
+    <p>{{data[0].Descripcion}}</p>
+  </div>
 </ng-template>
 

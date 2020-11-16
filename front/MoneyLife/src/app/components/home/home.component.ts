@@ -155,7 +155,7 @@ export class HomeComponent implements OnInit {
     // this.sellOwnInvestments(); // string Bien or error
     // this.seeMyLoans(); // MyLoans
     // this.reduceLoan(); // string error or Bien
-    // this.financialPortfolio(); // PortfolioBack
+    this.financialPortfolio(); // PortfolioBack
   }
   initTurn(): void {
     // this.eventService.initTurnEvent().subscribe(
@@ -173,15 +173,11 @@ export class HomeComponent implements OnInit {
     });
     this.questionsService.initTurnQuestions().subscribe(
       resp => {
-        console.log(resp);
+        // console.log(resp);
         this.questionsInv = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Inversion');
         this.questionsGoods = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Bienes Personales'); 
         this.questionsFun = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Diversion'); 
         this.questionsWork = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Laboral');
-        // console.log(this.questionsInv);
-        // console.log(this.questionsGoods);
-        // console.log(this.questionsFun);
-        // console.log(this.questionsWork);
       }, error => {
         //TODO: alert
     });
@@ -198,7 +194,7 @@ export class HomeComponent implements OnInit {
   questionSelected(questionID: number): void {
     this.questionsService.questionSelected(questionID).subscribe(
       resp => {
-        console.log(resp);
+        // console.log(resp);
         this.turn = resp[0];
       }, error => {
         //TODO: alert
@@ -334,6 +330,8 @@ export class HomeComponent implements OnInit {
     switch(activateModal.innerName) {
       case 'portfolio': 
         this.dataTitle = this.portfolio;
+        this.dataModal = this.portfolioBack;
+        console.log(this.dataModal);
         break;
       case 'newActions':
         this.dataTitle = this.newActions;
@@ -350,7 +348,7 @@ export class HomeComponent implements OnInit {
     }
     this.openModal = true;
   }
-  modalData(response: ModalResponse): void {
+  modalActions(response: ModalResponse): void {
     switch(response.innerName) {
       case 'questions': 
         this.questionSelected(response.data[0].Pregunta_id);
