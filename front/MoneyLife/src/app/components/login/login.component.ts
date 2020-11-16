@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { LoginService } from '../services/login.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit  } from '@angular/core';
+import { LoginService } from '../services/login.service';
+import { KeysDataUser } from 'src/app/auth/keys-data';
 import { User } from '../interfaces/user';
 import { Router } from '@angular/router';
 
@@ -23,19 +24,11 @@ export class LoginComponent implements OnInit {
   errorRecover = false;
   constructor(
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
     ) { }
 
   ngOnInit(): void {
     this.initForm();
-    this.register = {
-      username: '',
-      password: '' 
-    };
-    this.inputLogin = {
-      username: '',
-      password: ''  
-    };
   }
   initForm(): void {
     this.logInForm = new FormGroup({
@@ -68,15 +61,13 @@ export class LoginComponent implements OnInit {
     if (this.logInForm.status === 'VALID') {
       this.loginService.login(this.logInForm.value).subscribe(
         resp => {
-          console.log(resp);
-          localStorage.setItem('userID', resp.id);
-          this.router.navigateByUrl("/game");
+          this.setUser(resp as User);
         }, error => {
           //TODO: Alert error
         }
       );
     } else {
-      if (this.logInForm.controls.user.status === 'INVALID') {
+      if (this.logInForm.controls.username.status === 'INVALID') {
         this.errorUser = true;
       }
       if (this.logInForm.controls.password.status === 'INVALID') {
@@ -89,11 +80,7 @@ export class LoginComponent implements OnInit {
       if (this.registerForm.status === 'VALID') {
         this.loginService.register(this.registerForm.value).subscribe(
           resp => {
-            const user: User = resp as User;
-            console.log(user);
-            localStorage.setItem('userID', user.id.toString());
-            localStorage.setItem('username', user.id.toString());
-            this.router.navigateByUrl("/game");
+            this.setUser(resp as User);
           }, error => {
             // TODO Alert error
           }
@@ -113,6 +100,12 @@ export class LoginComponent implements OnInit {
       this.errorPassNew = true;
       this.errorPassNew2 = true;
     }
+  }
+
+  setUser(user: User): void {
+    localStorage.setItem(KeysDataUser.userid,  user.id.toString());
+    localStorage.setItem(KeysDataUser.username, user.username);
+    this.router.navigateByUrl("/game");
   }
   onSubmitRecover(): void {
     if (this.recoverForm.status === 'VALID') {

@@ -12,12 +12,24 @@ export class InitTurnService {
   constructor(
     private base: BaseService,
     private authService: AuthService) { }
-
-  initTurn(): Observable<any> {
+  
+  getUser(): any {
     const user = this.authService.getUser() as User;
-    const body = {
+    return {
       UserID: user.id
     }
-    return this.base.getBody(`turno/inicio`, body);
+  }
+
+  initTurn(): Observable<any> { // Called at the start of a new turn
+
+    return this.base.post(`turno/inicio/`, this.getUser());
+  }
+  
+  refreshTurn(): Observable<any> {
+    return this.base.post(`turno/intermedio/`, this.getUser());
+  }
+  financialPortfolio(): Observable<any> {
+    return this.base.post(`portafolio/financiero/`, this.getUser());
+
   }
 }

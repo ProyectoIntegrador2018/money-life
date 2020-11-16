@@ -18,6 +18,6 @@ export class EventService {
     const body = {
       UserID: user.id
     }
-    return this.base.getBody(`evento/inicioTurno/`, body);
+    return this.base.post(`evento/inicioTurno/`, body);
   }
 }

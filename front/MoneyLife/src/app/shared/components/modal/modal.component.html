@@ -37,6 +37,7 @@
                               </ng-container>
                             </div>
                             <div class="controls">
+                              <p id="accept" (click)="cancelModalFunc()">Cancelar</p>
                               <p id="accept" (click)="closeModal()">Aceptar</p>
                             </div>
                           </div>
@@ -73,6 +74,6 @@
 </ng-template>
 
 <ng-template #questions>
-  <p>Descripción </p>
+  <p>{{data[0].Descripcion}}</p>
 </ng-template>
 

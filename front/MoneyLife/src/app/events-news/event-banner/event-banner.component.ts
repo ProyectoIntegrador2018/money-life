@@ -6,7 +6,7 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./event-banner.component.scss']
 })
 export class EventBannerComponent implements OnInit {
-  @Input() msgs: any[];
+  @Input() msg: any;
 
   constructor() { }
 

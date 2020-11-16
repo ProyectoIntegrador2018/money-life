@@ -18,7 +18,7 @@ export class QuestionsService {
     const body = {
       UserID: user.id
     }
-    return this.base.getBody(`getPreguntas/`, body);
+    return this.base.post(`pregunta/getPreguntas/`, body);
   }
 
   questionSelected(questionID: number): any {
@@ -27,7 +27,8 @@ export class QuestionsService {
       UserID: user.id,
       PreguntaID: questionID
     }
-    return this.base.put(`pregunta/afectaPreguntas`, body);
+    console.log(body);
+    return this.base.put(`pregunta/afectaPreguntas/`, body);
   }
 
 }

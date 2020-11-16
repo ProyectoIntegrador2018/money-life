@@ -10,20 +10,16 @@ import { environment } from '../../../environments/environment';
 export class BaseService {
   constructor(private _http: HttpClient) { }
   
-  
-  getBody(url: string, body: any): Observable<any> {
-    return this._http.get<any>(environment.apiEndPointTest + url, body);
-  }
   get(url: string): Observable<any> {
-    return this._http.get<any>(environment.apiEndPointTest + url);
+    return this._http.get<ServerResponse>(environment.apiEndPoint + url);
   }
   post(url: string, body: any): any {
-    return this._http.post<ServerResponse>(environment.apiEndPointTest + url, body);
+    return this._http.post<ServerResponse>(environment.apiEndPoint + url, body);
   }
   put(url: string, body: any): any {
-    return this._http.put<ServerResponse>(environment.apiEndPointTest + url, body);
+    return this._http.put<ServerResponse>(environment.apiEndPoint + url, body);
   }
   // delete(url: string, body: any): any {
-  //   return this._http.delete(environment.apiEndPointTest + url);
+  //   return this._http.delete(environment.apiEndPoint + url);
   // }
 }

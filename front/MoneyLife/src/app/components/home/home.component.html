@@ -4,15 +4,16 @@
     <div class="wave"></div>
   </div>
 </div>
-<app-modal *ngIf="openModal" (close)="openModal = $event" [open]="openModal" [titles]="dataTitle"></app-modal>
+<app-modal *ngIf="openModal" (cancelModal)="cancelModal()" (close)="modalData($event)" [open]="openModal" [titles]="dataTitle" [data]="dataModal"></app-modal>
 <div class="header">
-  <app-loader [value]='100'></app-loader>
-  <app-event-notification *ngIf="show" [msg]="msg" [type]="'simple'" (close)="close($event)" ></app-event-notification>
+  <app-loader *ngIf="turn" [value]='turn.Felicidad'></app-loader>
+  <app-event-notification *ngIf="show && eventMicro" [msg]="eventMicro.Descripcion" [type]="'simple'" (close)="close($event)" ></app-event-notification>
   <app-button [ob]="portfolioBtn" (pressed)="openModalFun($event)"></app-button>
-  <app-digits-show [name]="'Ingresos'"></app-digits-show>
-  <app-digits-show [name]="'Egresos'"></app-digits-show>
-  <app-digits-show [name]="'Saldo actual'"></app-digits-show>
-  <app-button [ob]="endTurn" (pressed)="$event"></app-button>
+  <!-- <app-digits-show [name]="'Ingresos Mensuales'" [number]="turn.Ingresos"></app-digits-show> -->
+  <app-digits-show *ngIf="turn" [name]="'Ingresos Mensuales'" [number]="turn.Ingresos"></app-digits-show>
+  <app-digits-show *ngIf="turn" [name]="'Egresos Mensuales'" [number]="turn.Egresos"></app-digits-show>
+  <app-digits-show *ngIf="turn" [name]="'Saldo actual'" [number]="turn.DineroEfectivo"></app-digits-show>
+  <app-button [ob]="endTurn" (pressed)="closeGame()"></app-button>
 </div>
 
 <div class="cards" *ngIf="activeCards">
@@ -30,17 +31,8 @@
         <h2>Inversión</h2>
       </div>
       <div class="questions">
-        <div class="option" (click)="openModalCard()"> <!--TODO: ngFor send data to function-->
-          <p>Opición 1</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 2</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 3</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 4</p>
+        <div *ngFor="let q of questionsInv" class="option" (click)="openModalCard(q)">
+          <p class="concat">{{q.Descripcion}}</p>
         </div>
       </div>
     </flip-card-back>
@@ -60,17 +52,8 @@
         <h2>Diversión</h2>
       </div>
       <div class="questions">
-        <div class="option" (click)="openModalCard()"> <!--TODO: ngFor send data to function-->
-          <p>Opición 1</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 2</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 3</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 4</p>
+        <div *ngFor="let q of questionsFun" class="option" (click)="openModalCard(q)">
+          <p class="concat">{{q.Descripcion}}</p>
         </div>
       </div>
     </flip-card-back>
@@ -90,17 +73,8 @@
         <h2>Bienes personales</h2>
       </div>
       <div class="questions">
-        <div class="option" (click)="openModalCard()"> <!--TODO: ngFor send data to function-->
-          <p>Opición 1</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 2</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 3</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 4</p>
+        <div *ngFor="let q of questionsGoods" class="option" (click)="openModalCard(q)">
+          <p class="concat">{{q.Descripcion}}</p>
         </div>
       </div>
     </flip-card-back>
@@ -120,17 +94,8 @@
         <h2>Laborales</h2>
       </div>
       <div class="questions">
-        <div class="option" (click)="openModalCard()"> <!--TODO: ngFor send data to function-->
-          <p>Opición 1</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 2</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 3</p>
-        </div>
-        <div class="option" (click)="openModalCard()">
-          <p>Opción 4</p>
+        <div *ngFor="let q of questionsWork" class="option" (click)="openModalCard(q)">
+          <p class="concat">{{q.Descripcion}}</p>
         </div>
       </div>
     </flip-card-back>
@@ -148,4 +113,4 @@
     <app-button [ob]="myActionsBtn" (pressed)="openModalFun($event)"></app-button>
   </div>
 </div>
-<app-event-banner></app-event-banner>
+<app-event-banner *ngIf="eventMacro" [msg]="eventMacro.Descripcion"></app-event-banner>

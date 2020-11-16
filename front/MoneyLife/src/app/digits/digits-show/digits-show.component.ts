@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class DigitsShowComponent implements OnInit {
   @Input() name: string;
+  @Input() number: string;
 
   constructor() { }
 

@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
-  apiEndPoint:'',
-  apiEndPointTest: 'http://localhost:8080'
+  // apiEndPoint:'',
+  apiEndPoint: 'https://bad05c78fa45.ngrok.io/'
+  // apiEndPoint: 'http://localhost:8000'
 };
 
 /*

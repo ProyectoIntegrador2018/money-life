@@ -9,8 +9,8 @@ export class LoginService {
 
   constructor(private base: BaseService) { }
 
-  login(userData: any): Observable<any> {
-    return this.base.getBody('users/login', userData);
+  login(userData: JSON): Observable<any> {
+    return this.base.post('users/login/', userData);
   }
 
   register(userData: any): Observable<any> {
@@ -18,6 +18,6 @@ export class LoginService {
       username: userData.username,
       password: userData.password
     }
-    return this.base.post('users', body);
+    return this.base.post('users/', body);
   }
 }

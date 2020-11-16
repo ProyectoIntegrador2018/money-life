@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, HostListener, OnChanges } from '@angular/core';
-import { ModalTab } from '../../interfaces/modal-tab';
+import { ModalTab } from 'src/app/shared/interfaces/modal-tab';
+import { ModalResponse } from 'src/app/shared/interfaces/modal-response';
 
 @Component({
   selector: 'app-modal',
@@ -9,9 +10,13 @@ import { ModalTab } from '../../interfaces/modal-tab';
 export class ModalComponent implements OnInit, OnChanges {
   @Input() open: boolean;
   @Input() titles: ModalTab[];
-  @Output() close: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Input() data: any[];
+  @Output() close: EventEmitter<ModalResponse> = new EventEmitter<ModalResponse>();
+  @Output() cancelModal: EventEmitter<boolean> = new EventEmitter<boolean>();
   lastActive = 0;
   activeSwitch: ModalTab;
+  sendData: ModalResponse;
+  qty: number;
   constructor() { }
 
   ngOnInit(): void {
@@ -26,7 +31,13 @@ export class ModalComponent implements OnInit, OnChanges {
 
   closeModal(): void {
     this.open = false;
-    this.close.emit(false);
+    this.sendData = {
+      innerName: this.activeSwitch.internalName,
+      data: this.data,
+      qty: this.qty,
+      flag: false
+    }
+    this.close.emit(this.sendData);
   }
   changeTab(tab: ModalTab): void {
     if(this.titles[this.lastActive]) {
@@ -37,8 +48,11 @@ export class ModalComponent implements OnInit, OnChanges {
     }
   }
 
+  cancelModalFunc(): void {
+    this.cancelModal.emit(false);
+  }
   @HostListener('document:keyup.escape', ['$event'])
   onEscape() {
-    this.closeModal();
+    this.cancelModalFunc();
   }
 }
