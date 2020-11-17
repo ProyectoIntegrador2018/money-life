@@ -1,0 +1,26 @@
+version: "3"
+services:
+  moneylifedbserver.mysql.database.azure.com:
+    image : mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql/data
+  django_app:
+    build : .
+    volumes:
+      - static:/code/static
+      - .:/code
+    depends_on:
+      - moneylifedbserver.mysql.database.azure.com
+  
+  nginx:
+    image : nginx:1.13
+    ports :
+      - 8000:80
+    volumes:
+      - ./config/nginx/conf.d:/etc/nginx/conf.d 
+      - static:/code/static
+
+volumes:
+  .:
+  mysql_data:
+  static:
