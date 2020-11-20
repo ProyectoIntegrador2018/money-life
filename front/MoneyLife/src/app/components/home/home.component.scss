@@ -1,0 +1,113 @@
+
+.background {
+  z-index: -1;
+  width: 100vw;
+  height: 100vh; 
+  background:radial-gradient(ellipse at center, rgba(255,254,234,1) 0%, rgba(255,254,234,1) 35%, #B7E8EB 100%);
+  position: fixed; 
+  overflow: hidden;
+}
+
+.ocean { 
+  height: 5%;
+  width:100%;
+  position:absolute;
+  bottom:0;
+  left:0;
+  background: #015871;
+}
+
+.wave {
+  background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/85486/wave.svg) repeat-x; 
+  position: absolute;
+  top: -198px;
+  width: 6400px;
+  height: 198px;
+  animation: wave 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.wave:nth-of-type(2) {
+  top: -175px;
+  animation: wave 7s cubic-bezier( 0.36, 0.45, 0.63, 0.53) -.125s infinite, swell 7s ease -1.25s infinite;
+  opacity: 1;
+}
+
+@keyframes wave {
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: -1600px;
+  }
+}
+
+@keyframes swell {
+  0%, 100% {
+    transform: translate3d(0,-25px,0);
+  }
+  50% {
+    transform: translate3d(0,5px,0);
+  }
+}
+
+//header
+.header {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+// Cards and buttons position
+.cards, .buttons {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: space-evenly;
+}
+.buttons {
+  margin-top: 30px;
+  justify-content: space-between;
+  .btn-left {
+    display: grid;
+  }
+  .btn-right {
+    display: grid;
+
+  }
+}
+
+.cards {
+  .title {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .emblem {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    img {
+      width: 200px;
+      height: auto;
+      margin: auto;
+    }
+  }
+  .concat {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+  }
+}
+.questions {
+  height: 100%;
+  width: 100%;
+  .option {
+    width: 100%;
+    height: 100%;
+    &:hover {
+      color: black;
+      cursor: pointer;
+    }
+  }
+}

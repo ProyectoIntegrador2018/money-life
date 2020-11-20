@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { LoginService } from 'src/app/services/login.service'; //Llamar servicio de login
+import { Component, OnInit  } from '@angular/core';
+import { LoginService } from '../services/login.service';
+import { KeysDataUser } from 'src/app/auth/keys-data';
+import { User } from '../interfaces/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -19,25 +22,17 @@ export class LoginComponent implements OnInit {
   errorPassNew = false;
   errorPassNew2 = false;
   errorRecover = false;
-  register; //Variable para guardar input de usuario
-  inputLogin; //Variable para login
-
-  constructor(private loginService : LoginService) { }
+  constructor(
+    private loginService: LoginService,
+    private router: Router,
+    ) { }
 
   ngOnInit(): void {
     this.initForm();
-    this.register = {
-      username: '',
-      password: '' 
-    };
-    this.inputLogin = {
-      username: '',
-      password: ''  
-    };
   }
   initForm(): void {
     this.logInForm = new FormGroup({
-      user: new FormControl('', [
+      username: new FormControl('', [
         Validators.required,
         Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')
       ]),
@@ -45,14 +40,15 @@ export class LoginComponent implements OnInit {
       [Validators.required])
     });
     this.registerForm = new FormGroup({
-      newUser: new FormControl('', [
+      username: new FormControl('', [
         Validators.required,
         Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')
       ]),
-      newPassword: new FormControl('', [
+      password: new FormControl('', [
         Validators.required]),
-      newPassword2: new FormControl('',[
-        Validators.required]),
+      password2: new FormControl('',[
+        Validators.required],
+        ),
     });
     this.recoverForm = new FormGroup({
       recoverEmail: new FormControl('', [
@@ -62,21 +58,16 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.logInForm.status);
     if (this.logInForm.status === 'VALID') {
-      // TODO: call services to make log in
-      this.inputLogin.username = this.logInForm.controls.user.value
-      this.inputLogin.password = this.logInForm.controls.password.value
-
-      this.loginService.onLogin(this.inputLogin).subscribe(
-        (resp) => {
-          console.log('Se inicio session')
-        },
-        (error) => console.log('error', error)
+      this.loginService.login(this.logInForm.value).subscribe(
+        resp => {
+          this.setUser(resp as User);
+        }, error => {
+          //TODO: Alert error
+        }
       );
-
     } else {
-      if (this.logInForm.controls.user.status === 'INVALID') {
+      if (this.logInForm.controls.username.status === 'INVALID') {
         this.errorUser = true;
       }
       if (this.logInForm.controls.password.status === 'INVALID') {
@@ -85,28 +76,36 @@ export class LoginComponent implements OnInit {
     }
   }
   onSubmitRegister(): void {
-    if (this.registerForm.status === 'VALID') {
-      // TODO: call services to make registration
-      this.register.username = this.registerForm.controls.newUser.value
-      this.register.password = this.registerForm.controls.newPassword.value
-
-      this.loginService.postRegister(this.register).subscribe(
-        (resp) => {
-          console.log('Se creo '+ this.register.username)
-        },
-        (error) => console.log('error', error)
-      );
+    if (this.registerForm.controls.password.value === this.registerForm.controls.password2.value) {
+      if (this.registerForm.status === 'VALID') {
+        this.loginService.register(this.registerForm.value).subscribe(
+          resp => {
+            this.setUser(resp as User);
+          }, error => {
+            // TODO Alert error
+          }
+        );
+      } else {
+        if (this.registerForm.controls.username.status === 'INVALID') {
+          this.errorUserNew = true;
+        }
+        if (this.registerForm.controls.password.status === 'INVALID') {
+          this.errorPassNew = true;
+        }
+        if (this.registerForm.controls.password2.status === 'INVALID') {
+          this.errorPassNew2 = true;
+        }
+      }
     } else {
-      if (this.registerForm.controls.newUser.status === 'INVALID') {
-        this.errorUserNew = true;
-      }
-      if (this.registerForm.controls.newPassword.status === 'INVALID') {
-        this.errorPassNew = true;
-      }
-      if (this.registerForm.controls.newPassword2.status === 'INVALID') {
-        this.errorPassNew2 = true;
-      }
+      this.errorPassNew = true;
+      this.errorPassNew2 = true;
     }
+  }
+
+  setUser(user: User): void {
+    localStorage.setItem(KeysDataUser.userid,  user.id.toString());
+    localStorage.setItem(KeysDataUser.username, user.username);
+    this.router.navigateByUrl("/game");
   }
   onSubmitRecover(): void {
     if (this.recoverForm.status === 'VALID') {
