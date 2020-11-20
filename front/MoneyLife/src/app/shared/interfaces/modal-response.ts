@@ -1,6 +1,7 @@
 export interface ModalResponse {
     innerName: string;
     data: any;
-    qty: number;
+    qty?: number;
+    hitch?: number;
     flag: boolean;
 }

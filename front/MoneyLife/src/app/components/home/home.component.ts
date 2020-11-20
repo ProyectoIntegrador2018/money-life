@@ -1,3 +1,5 @@
+// TODO: meter las igualaciones dentro de las funciones
+// TODO: identificar cuando se llama a algo
 import { Component, OnInit } from '@angular/core';
 import { KeysDataUser } from 'src/app/auth/keys-data';
 import { Router } from '@angular/router';
@@ -68,12 +70,12 @@ export class HomeComponent implements OnInit {
     }
   ]
   newActionsBtn: Button = {
-    name: 'Bolsa',
+    name: 'Inversion en bolsa',
     innerName: 'newActions',
   };
   newActions: ModalTab[] = [
     {
-      name: 'Bolsa',
+      name: 'Inversion en bolsa',
       active: true,
       internalName: 'newActions',
       position: 0
@@ -97,15 +99,15 @@ export class HomeComponent implements OnInit {
   };
   myActions: ModalTab[] = [
     {
-      name: 'Bolsa',
+      name: 'Inversion en bolsa',
       active: true,
-      internalName: 'newActions',
+      internalName: 'myActions',
       position: 0
     },
     {
       name: 'Personales',
       active: false,
-      internalName: 'newActions',
+      internalName: 'myActions',
       position: 1
     }
   ];
@@ -139,32 +141,33 @@ export class HomeComponent implements OnInit {
     private turnService: InitTurnService
     ) { }
 
-  ngOnInit(): void {
-    this.initTurn(); // Init Event, Turn, Init Question
+    ngOnInit(): void {
+      this.initTurn(); // Init Event, Turn, Init Question DEJAR
     // this.refreshTurn(); // Turn
-    // this.questionSelected(); // Turn
-    // this.catalogueActions(); // SharesStock
-    // this.selectedAction(); // string Bien or error
-    // this.catalogueLoan(); // Loan
-    // this.selectedLoan(); // String Bien or error
-    this.myInvestments(); //MyInvestments
-    // this.investMoreMoney(); // string Bien or error
-    // this.getMoneyfromAction(); // string error
     // this.sellAction(); // string Bien or error
-    this.getOwnInvestment(); // PersonalInvestments
     // this.sellOwnInvestments(); // string Bien or error
+    // this.getMoneyfromAction(); // string error
+    // this.catalogueActions(); // SharesStock DEJAR
+    // this.investMoreMoney(); // string Bien or error
+    // this.selectedAction(); // string Bien or error
+    // this.catalogueLoan(); // Loan DEJAR
+    // this.selectedLoan(); // String Bien or error
     // this.seeMyLoans(); // MyLoans
     // this.reduceLoan(); // string error or Bien
-    this.financialPortfolio(); // PortfolioBack
+    // this.questionSelected(); //Turn XXX
   }
   initTurn(): void {
-    // this.eventService.initTurnEvent().subscribe(
-    //   resp => {
-    //     this.eventMicro = resp.filter((res: InitEvent) => res.TipoEvento === 'Micro')[0];
-    //     this.eventMacro = resp.filter((res: InitEvent) => res.TipoEvento === 'Macro')[0];
-    // }, error => {
-    //   // TODO: Alert
-    // });
+    this.eventService.initTurnEvent().subscribe(
+      resp => {
+        if (resp) {
+          const micro = resp.filter((res: InitEvent) => res.TipoEvento === 'Micro')[0];
+          const macro = resp.filter((res: InitEvent) => res.TipoEvento === 'Macro')[0];
+          this.eventMicro = (micro) ? micro : null;
+          this.eventMacro = (macro) ? macro : [];
+        }
+    }, error => {
+      // TODO: Alert
+    });
     this.turnService.initTurn().subscribe(
       resp => {
         this.turn = resp[0];
@@ -173,7 +176,6 @@ export class HomeComponent implements OnInit {
     });
     this.questionsService.initTurnQuestions().subscribe(
       resp => {
-        console.log(resp);
         this.questionsInv = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Inversion');
         this.questionsGoods = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Bienes Personales'); 
         this.questionsFun = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Diversion'); 
@@ -181,21 +183,32 @@ export class HomeComponent implements OnInit {
       }, error => {
         //TODO: alert
     });
+    this.financialPortfolio(); //PortfolioBack DEJAR
+    this.getOwnInvestment(); //PersonalInvestments DEJAR
+    this.myInvestments(); //MyInvestments DEJAR
+    this.catalogueLoan(); // Loan DEJAR?
+    this.catalogueActions(); // SharesStock DEJAR
   }
   refreshTurn(): void {
     this.turnService.refreshTurn().subscribe(
       resp => {
-        this.turn = resp[0];
+        this.turn = resp[0] as Turn;
       }, error => {
         //TODO: alert
       }
     );
+    this.financialPortfolio(); //PortfolioBack DEJAR
+    this.getOwnInvestment(); //PersonalInvestments DEJAR
+    this.myInvestments(); //MyInvestments DEJAR
+    this.catalogueLoan(); // Loan DEJAR?
+    this.catalogueActions(); // SharesStock DEJAR
   }
   questionSelected(questionID: number): void {
     this.questionsService.questionSelected(questionID).subscribe(
       resp => {
         // console.log(resp);
-        this.turn = resp[0];
+        this.turn = resp[0] as Turn;
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -204,16 +217,19 @@ export class HomeComponent implements OnInit {
   catalogueActions(): void {
     this.actionService.getCatalogue().subscribe(
       resp => {
-        this.shareStock = resp;
+        // this.shareStock = resp;
+        this.dataModal = resp as SharesStock[];
       }, error => {
         //TODO: alert
       }
     );
   }
-  selectedAction(): void {
-    this.actionService.investToNewAction(1, 1000).subscribe(
+  selectedAction(actionID: number, qty: number): void {
+    this.actionService.investToNewAction(actionID, qty).subscribe(
       resp => {
-        window.alert(resp[0]);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -222,16 +238,20 @@ export class HomeComponent implements OnInit {
   catalogueLoan(): void {
     this.loanService.getCatalogue().subscribe(
       resp => {
-        this.loans = resp;
+        // this.loans = resp;
+        // console.log('loans', resp);
+        this.dataModal = resp as Loans[];
       }, error => {
         //TODO: alert
       }
     );
   }
-  selectedLoan(): void {
-    this.loanService.selectedLoan(1, 2000, 200).subscribe(
+  selectedLoan(loanID: number, totalValue: number, hitch: number): void {
+    this.loanService.selectedLoan(loanID, totalValue, hitch).subscribe(
       resp => {
-        window.alert(resp);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -240,35 +260,40 @@ export class HomeComponent implements OnInit {
   myInvestments(): void {
     this.actionService.myActions().subscribe(
       resp => {
-        // console.log(resp);
-        this.myInv = resp; 
+        this.myInv = resp as MyInvestments[]; 
       }, error => {
         //TODO: alert
       }
     );
   }
-  investMoreMoney(): void {
-    this.actionService.investToOwnAction(3, 500).subscribe(
+  investMoreMoney(actionID: number, qty: number): void {
+    this.actionService.investToOwnAction(actionID, qty).subscribe(
       resp => {
-        window.alert(resp[0]);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
     );
   }
-  getMoneyfromAction(): void {
-    this.actionService.getMoneyFromAction(5, 1000).subscribe(
+  getMoneyfromAction(actionID: number, qty: number): void {
+    this.actionService.getMoneyFromAction(actionID, qty).subscribe(
       resp => {
-        window.alert(resp[0]);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
     );
   }
-  sellAction(): void {
-    this.actionService.sellAction(1).subscribe(
+  sellAction(actionID: number): void {
+    this.actionService.sellAction(actionID).subscribe(
       resp => {
-        window.alert(resp[0]);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -278,16 +303,17 @@ export class HomeComponent implements OnInit {
     this.actionService.myOwnInvestmentFromQuestions().subscribe(
       resp => {
         this.personalInvestments = resp;
-        console.log(resp);
       }, error => {
         //TODO: alert
       }
     );
   }
-  sellOwnInvestments(): void {
-    this.actionService.sellOwnInvestments(1).subscribe(
+  sellOwnInvestments(actionID: number): void {
+    this.actionService.sellOwnInvestments(actionID).subscribe(
       resp => {
-        window.alert(resp[0]);
+        window.alert(resp.mensaje);
+        console.log(resp);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -296,16 +322,20 @@ export class HomeComponent implements OnInit {
   seeMyLoans(): void {
     this.loanService.seeMyLoans().subscribe(
       resp => {
-        this.myLoans = resp;
+        // this.myLoans = resp;
+        console.log(resp);
+        this.dataModal = resp;
       }, error => {
         //TODO: alert
       }
     );
   }
-  reduceLoan(): void {
-    this.loanService.payLoan(13, 500).subscribe(
+  reduceLoan(loanID: number, qty: number): void {
+    this.loanService.payLoan(loanID, qty).subscribe(
       resp => {
-        window.alert(resp[0]);
+        console.log(resp);
+        window.alert(resp.mensaje);
+        this.refreshTurn();
       }, error => {
         //TODO: alert
       }
@@ -314,7 +344,8 @@ export class HomeComponent implements OnInit {
   financialPortfolio(): void {
     this.turnService.financialPortfolio().subscribe(
       resp => {
-        this.portfolioBack = resp;
+        // this.portfolioBack = resp;
+        this.dataModal = resp as Portfolio[];
       }, error => {
         //TODO: alert
       }
@@ -329,51 +360,67 @@ export class HomeComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
   openModalFun(activateModal: Button): void { // Modal
+    console.log(activateModal);
     switch(activateModal.innerName) {
       case 'portfolio': 
+        this.financialPortfolio();
+        // this.dataModal = this.portfolioBack;
         this.dataTitle = this.portfolio;
-        this.dataModal = this.portfolioBack;
-        console.log(this.dataModal);
         break;
       case 'newActions':
+        this.catalogueActions();
+        // this.dataModal = this.shareStock;
         this.dataTitle = this.newActions;
         break;
       case 'newLoan':
+        this.catalogueLoan();
+        // this.dataModal = this.loans;
         this.dataTitle = this.newLoan;
         break;
       case 'myActions':
         this.myInvestments();
         this.getOwnInvestment();
         this.dataModal = [{
-          shared: this.myInv,
-          own: this.personalInvestments
-        }]
+          shared: this.myInv as MyInvestments[],
+          own: this.personalInvestments as PersonalInvestments[]
+        }];
         this.dataTitle = this.myActions;
         break;
-      case 'myLoans':
+      case 'myLoans': 
+        this.seeMyLoans();
         this.dataTitle = this.myLoansTitle;
         break;
     }
     this.openModal = true;
   }
   modalActions(response: ModalResponse): void {
+    console.log(response);
     switch(response.innerName) {
       case 'questions': 
         this.questionSelected(response.data[0].Pregunta_id);
         this.activeCards = false;
-      break;
-      // case 'newActions':
-      //   this.dataTitle = this.newActions;
-      //   break;
-      // case 'newLoan':
-      //   this.dataTitle = this.newLoan;
-      //   break;
-      // case 'myActions':
-      //   this.dataTitle = this.myActions;
-      //   break;
-      // case 'myLoans':
-      //   this.dataTitle = this.myLoansTitle;
-      //   break;
+        break;
+      case 'newActions':
+        this.selectedAction(response.data.id, response.qty);
+        break;
+      case 'newLoan':
+        this.selectedLoan(response.data.id, response.qty, response.hitch);
+        break;
+      case 'myActionsSell':
+        this.sellAction(response.data.id);
+        break;
+      case 'myActionsgetMoney':
+        this.getMoneyfromAction(response.data.id, response.hitch);
+        break;
+      case 'myActionsinvest':
+        this.investMoreMoney(response.data.id, response.qty);
+        break;
+      case 'myActionsPersonal':
+        this.sellOwnInvestments(response.data.id);
+        break;
+      case 'myLoans':
+        this.reduceLoan(response.data.PrestamoID, response.qty);
+        break;
     }
     this.openModal = response.flag;
   }

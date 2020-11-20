@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from './components/modal/modal.component';
 import { ButtonComponent } from './components/button/button.component';
@@ -11,7 +12,8 @@ import { ButtonComponent } from './components/button/button.component';
     ButtonComponent,
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    FormsModule
   ],
   exports: [
     ModalComponent,

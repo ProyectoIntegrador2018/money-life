@@ -11,5 +11,8 @@ export class EventBannerComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    if (!this.msg) {
+      this.msg = "No hay noticias";
+    }
   }
 }

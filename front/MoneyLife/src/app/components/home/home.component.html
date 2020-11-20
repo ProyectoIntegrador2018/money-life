@@ -107,10 +107,11 @@
     <app-button [ob]="newLoanBtn" (pressed)="openModalFun($event)"></app-button>
     <app-button [ob]="newActionsBtn" (pressed)="openModalFun($event)"></app-button>
   </div>
-  <app-box (act)="resetCards($event)"></app-box>
+  <app-box (act)="resetCards($event)" (click)="initTurn()"></app-box>
   <div class="btn-right">
     <app-button [ob]="myLoansBtn" (pressed)="openModalFun($event)"></app-button>
     <app-button [ob]="myActionsBtn" (pressed)="openModalFun($event)"></app-button>
   </div>
 </div>
-<app-event-banner *ngIf="eventMacro" [msg]="eventMacro.Descripcion"></app-event-banner>
+<app-event-banner [msg]="eventMacro?.Descripcion"></app-event-banner>
+<!-- ERROR porque no tiene evento descripcion -->
