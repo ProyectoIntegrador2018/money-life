@@ -27,14 +27,15 @@ class UserViewSet(viewsets.ModelViewSet):
     #authentication_classes = {TokenAuthentication,}
     #permission_classes = {IsAuthenticated,}
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def login(self, request):
+        print("Entro =",request.data)
         print("ENTRO A GET LOGIN")
         userData = request.data
         user = authenticate(username=userData['username'], password=userData['password'])
         if user == None:
             return JsonResponse({'error': "Usuario o contrasena incorrecta"}, safe = False)
-        return JsonResponse({'id': user.id}, safe = False)
+        return JsonResponse({'id': user.id, 'username': user.username}, safe = False)
 
 
 ###################################################################
@@ -45,9 +46,10 @@ class EventoViewSet(viewsets.ModelViewSet):
     serializer_class = EventoSerializer
 
     #Se llama al inicio del turno
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def inicioTurno(self, request):
-        print("ENTROOOOO INICIOOOO TURNOOOO")
+        print("ENTROOOOO EVENTO INICIOOOO TURNOOOO")
+        print(request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first() 
         eventos = scripts.seleccionEvento(user)
@@ -68,8 +70,10 @@ class PreguntaViewSet(viewsets.ModelViewSet):
     queryset = Preguntas.objects.all()
     serializer_class = PreguntasSerializer
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def getPreguntas(self, request):
+        print("ENTROOOOO PREGUNTA INICIOOOO TURNOOOO")
+        print(request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first()
         preguntas = scripts.seleccionPregunta(user)
@@ -80,6 +84,8 @@ class PreguntaViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def afectaPreguntas(self, request):
+        print("ENTROOOOO PREGUNTA AFECTA INICIOOOO TURNOOOO")
+        print(request.data)
         jsonPregunta = request.data
         
         user = User.objects.filter(id = jsonPregunta['UserID']).first()
@@ -112,8 +118,10 @@ class TurnosViewSet(viewsets.ModelViewSet):
     serializer_class = TurnosSerializer
 
     #Este servicio se manda cada que inicie el turno
-    @action(methods=['get'], detail=False)  #se necesita el usuario
+    @action(methods=['get', 'post'], detail=False)  #se necesita el usuario
     def inicio(self, request):
+        print("ENTROOOOO INICIOOOO TURNOOOO")
+        print(request.data)
         jsonTurno = request.data
         user = User.objects.filter(id = jsonTurno["UserID"]).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -135,8 +143,10 @@ class TurnosViewSet(viewsets.ModelViewSet):
         serializer = TurnosSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    @action(methods=['get'], detail=False)  #se necesita el usuario
+    @action(methods=['get', 'post'], detail=False)  #se necesita el usuario
     def intermedio(self, request):
+        print("ENTROOOOO TURNOOOO INTERMEDIO")
+        print(request.data)
         jsonTurno = request.data
         user = User.objects.filter(id = jsonTurno["UserID"]).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -156,15 +166,18 @@ class PrestamoViewSet(viewsets.ModelViewSet):
     serializer_class = PrestamosSerializer
 
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def catalogo(self, request):
+        print("ENTROOOOO CATALOGO PRESTAMOS")
+        print(request.data)
         queryset = TipoPrestamo.objects.all()
         serializer = PrestamosSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
 
     @action(methods=['put'], detail=False)
     def Realizar(self, request):
-
+        print("ENTROOOOO RALIZAR PRESTAMO")
+        print(request.data)
         jsonPrestamo = request.data
 
         minimoAprobatorio = jsonPrestamo["ValorTotal"] * .10
@@ -202,7 +215,8 @@ class PrestamoViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def Amortizacion(self, request):
-
+        print("ENTROOOOO AMORTIZACION")
+        print(request.data)
         jsonPrestamo = request.data
 
         user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
@@ -212,6 +226,8 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
             return JsonResponse({"error": "El saldo absoluto es menos que la amortización"}, safe=False)
         
+        print("Dinero de turno = ", turno.DineroEfectivo)
+
         if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
             return JsonResponse({"error": "No tienes la cantidad requerida para esta accion"}, safe=False)
 
@@ -235,8 +251,10 @@ class PrestamoViewSet(viewsets.ModelViewSet):
 
         return JsonResponse({"Bien":"Se realizo la amoritizacion de forma correcta"}, safe=False)
     
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def prestamosActuales(self, request):
+        print("ENTROOOOO PRESTAMOS ACTUALES")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Prestamo.objects.filter(User=user)
@@ -258,9 +276,10 @@ class InversionViewSet(viewsets.ModelViewSet):
     queryset = TipoInversiones.objects.all()
     serializer_class = TipoInversionesSerializer
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def catalogoDisponibles(self, request):
-
+        print("ENTROOOOO CATALOGO DISPONIBLES")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Inversion.objects.filter(User=user)
@@ -273,9 +292,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         serializer = TipoInversionesSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    @action(methods=['get'], detail=False)
-    def inversinesActuales(self, request):
-
+    @action(methods=['get', 'post'], detail=False)
+    def inversionesActuales(self, request):
+        print("ENTROOOOO INVERSIONES ACTUALES")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Inversion.objects.filter(User=user)
@@ -284,8 +304,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         serializer = InversionesSerializer(queryset, many=True)
         return JsonResponse(serializer.data, safe=False)
     
-    @action(methods=['get'], detail=False)
-    def inversinesPersonalesActuales(self, request):
+    @action(methods=['get', 'post'], detail=False)
+    def inversionesPersonalesActuales(self, request):
+        print("ENTROOOOO INVERSIONES PERSONALES")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
 
@@ -306,7 +328,8 @@ class InversionViewSet(viewsets.ModelViewSet):
     
     @action(methods=['post'], detail=False)
     def nueva(self, request):
-
+        print("ENTROOOOO NUEVA INVERSION")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -329,7 +352,8 @@ class InversionViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def agregarDinero(self, request):
-
+        print("ENTROOOOO AGREGAR DINERO")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -353,7 +377,8 @@ class InversionViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def retirarDinero(self, request):
-        
+        print("ENTROOOOO RETIRAR DINERO")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -376,7 +401,8 @@ class InversionViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def retirarAccion(self, request):
-        
+        print("ENTROOOOO RETIRAR ACCION")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -390,7 +416,8 @@ class InversionViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def retirarInversionPersonal(self, request):
-
+        print("ENTROOOOO RETIRAR INVERSION PERSONAL")
+        print(request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -407,8 +434,10 @@ class InversionViewSet(viewsets.ModelViewSet):
 ###################################################################
 class PortafolioViewSet(viewsets.ModelViewSet):
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def financiero(self, request):
+        print("ENTROOOOO PORTAFOLIO FINANCIERO")
+        print(request.data)
         jsonPortafolio = request.data
         user = User.objects.filter(id = jsonPortafolio['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -457,6 +486,8 @@ class FinJuegoViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def juego(self, request):
+        print("ENTROOOOO FIN DEL JUEGO")
+        print(request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first()
 
