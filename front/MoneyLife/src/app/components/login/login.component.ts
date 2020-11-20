@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
 
       this.loginService.onLogin(this.inputLogin).subscribe(
         (resp) => {
-          console.log('Se inicio session')
+          console.log(resp);
         },
         (error) => console.log('error', error)
       );
