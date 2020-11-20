@@ -1,0 +1,54 @@
+.container {
+  width: 200px;
+  height: 300px;
+  display: block;
+  position: relative;
+  perspective: 800px;
+  border-radius: 4px;
+  .card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transform-style: preserve-3d;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+    .front, .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      padding: 10px;
+      place-items: center;
+      border-radius: 6px;
+      backface-visibility: hidden;
+      background-color: #128bea;
+      border: 1px solid black;
+    }
+  }
+
+  .back {
+    transform: rotateY(180deg);
+  }
+
+  .flipped {
+    transform: rotateY(180deg);
+  }
+
+  .arrow-icon {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    opacity: 1;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    justify-content: center;
+    border: 1px solid #fff;
+  }
+}

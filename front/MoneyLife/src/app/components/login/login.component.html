@@ -23,7 +23,7 @@
     <form class="inputs" [formGroup]="logInForm" (ngSubmit)="onSubmit()">
         <div class="input">
             <img src="assets/user-profile.png" alt="">
-            <input type="text" name="user" (click)="errorUser = false" formControlName="user" [ngClass]="{'error': errorUser}" placeholder="Correo"/>
+            <input type="text" name="username" (click)="errorUser = false" formControlName="username" [ngClass]="{'error': errorUser}" placeholder="Correo"/>
         </div>
         
         <div class="input">
@@ -41,17 +41,17 @@
     <form class="inputs" [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
         <div class="input">
             <img src="assets/user-profile.png" alt="">
-            <input type="text" name="newUser" (click)="errorUserNew = false" formControlName="newUser" [ngClass]="{'error': errorUserNew}" placeholder="Correo"/>
+            <input type="text" name="username" (click)="errorUserNew = false" formControlName="username" [ngClass]="{'error': errorUserNew}" placeholder="Correo"/>
         </div>
         
         <div class="input">
             <img src="assets/lock.png" alt="">
-            <input type="password" name="password" (click)="errorPassNew = false" formControlName="newPassword" [ngClass]="{'error': errorPassNew}" placeholder="Contraseña"/>
+            <input type="password" name="password" (click)="errorPassNew = false" formControlName="password" [ngClass]="{'error': errorPassNew}" placeholder="Contraseña"/>
         </div>
 
         <div class="input">
             <img src="assets/lock.png" alt="">
-            <input type="password" name="password2" (click)="errorPassNew2 = false" formControlName="newPassword2" [ngClass]="{'error': errorPassNew2}" placeholder="Repetir contraseña"/>
+            <input type="password" name="password2" (click)="errorPassNew2 = false" formControlName="password2" [ngClass]="{'error': errorPassNew2}" placeholder="Repetir contraseña"/>
         </div>
 
         <button class="btn-login" type="submit">Registrarse</button>
