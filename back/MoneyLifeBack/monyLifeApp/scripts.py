@@ -40,7 +40,6 @@ def getAfectaEvento(response):
 """
 
 def verificarRequisitos(id, turno, flag_tipo):
-    print('Requisitosfunc')
     if(flag_tipo == 'Pregunta'):
         requisitos = Preguntas_Requisitos.objects.filter(Preguntas_id = id)
     else:
@@ -293,11 +292,10 @@ def afectaInversion(afecta, user):
 def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
     df = pd.DataFrame(list(queryset.values()))
     df['FrecuenciaAcumulada'] = df['Frecuencia'].cumsum()
-    limite_inferior = df['FrecuenciaAcumulada'].min()
-    limite_superior = df['FrecuenciaAcumulada'].max()
     df = df.sample(frac=1).reset_index(drop=True)
-    print(df)
     for x in range(0,4,1):
+        limite_inferior = df['FrecuenciaAcumulada'].min()
+        limite_superior = df['FrecuenciaAcumulada'].max()
         borrar = -10
         seleccion = random.uniform(limite_inferior,limite_superior)
         for index, row in df.iterrows():
@@ -305,19 +303,19 @@ def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
                 desc = Preguntas.objects.get(id=row['Pregunta_id'])
                 desc = str(desc.Descripcion)
                 descTipo = TipoPregunta.objects.get(id=row['TipoPreguntas_id'])
-                descTipo = str(descTipo.TipoPregunta)
+                descTipo = str(descTipo.TipoPregunta).split('_')[0]
                 temp = row[['Pregunta_id']].to_dict()
                 temp['Descripcion'] = desc
-                temp['TipoEvento'] = descTipo
+                temp['TipoPregunta'] = descTipo
                 preguntas.append(temp)
                 borrar = index
-                print(row['Pregunta_id'])
-                print(row['TipoPreguntas_id'])
                 df.drop(borrar, inplace = True, errors = 'ignore' )
                 borrar = -10
                 break
             else:
                 pass
+
+    print("SE SELECCIONARON ", len(preguntas), " PREGUNTAS ")
         
 
 def seleccionPregunta(user):

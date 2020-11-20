@@ -34,7 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
         userData = request.data
         user = authenticate(username=userData['username'], password=userData['password'])
         if user == None:
-            return JsonResponse({'error': "Usuario o contrasena incorrecta"}, safe = False)
+            return JsonResponse({'mensaje': "Usuario o contrasena incorrecta"}, safe = False)
         return JsonResponse({'id': user.id, 'username': user.username}, safe = False)
 
 
@@ -76,10 +76,16 @@ class PreguntaViewSet(viewsets.ModelViewSet):
         print(request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first()
+
         preguntas = scripts.seleccionPregunta(user)
         output = json.dumps(preguntas)
         response = json.loads(output)
-        print(response)
+        
+        cont = 0
+        for i in response:
+            cont = cont + 1
+        print("REGRESO ",cont," PREGUNTAS")
+        #print(response)
         return JsonResponse(response, safe = False)
 
     @action(methods=['put'], detail=False)
@@ -100,7 +106,7 @@ class PreguntaViewSet(viewsets.ModelViewSet):
                 print("prueba ",afecta.Afecta)
             scripts.afectaTurnosPregunta(afectasPregunta, turno)
         else:
-            return JsonResponse({"error":"No cuentas con los requisitos necesarios para esta accion"}, safe=False)
+            return JsonResponse({"mensaje":"No cuentas con los requisitos necesarios para esta accion"}, safe=False)
 
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
@@ -183,10 +189,10 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         minimoAprobatorio = jsonPrestamo["ValorTotal"] * .10
 
         if jsonPrestamo["Enganche"] < minimoAprobatorio:
-            return JsonResponse({"error": "El enganche no puede ser menor al 10 porciento del valor total"}, safe=False)
+            return JsonResponse({"mensaje": "El enganche no puede ser menor al 10 porciento del valor total"}, safe=False)
 
         if jsonPrestamo["Enganche"] >= jsonPrestamo["ValorTotal"]:
-            return JsonResponse({"error": "El enganche es mayor al prestamo pedido"}, safe=False)
+            return JsonResponse({"mensaje": "El enganche es mayor al prestamo pedido"}, safe=False)
 
         user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -203,7 +209,7 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         print(interesMensual)
 
         if turno.Ingresos < pagoMensual:
-            return JsonResponse({"error": "No cuentas con los ingresos necesarios para realizar este pedido"}, safe=False)
+            return JsonResponse({"mensaje": "No cuentas con los ingresos necesarios para realizar este pedido"}, safe=False)
 
         prestamoUser = Prestamo(User=user, idPrestamo=tipoPrestamo, ValorTotal=jsonPrestamo["ValorTotal"], CantidadPrestada=cantidadPrestada, Enganche=jsonPrestamo["Enganche"], Frecuencia=4, Amortizacion=0, Interes=interesMensual, Mensualidad=pagoMensual, AbonoCapital=0, SaldoAbsoluto=cantidadPrestada )
         prestamoUser.save()
@@ -211,7 +217,7 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidadPrestada)
         turno.save()
 
-        return JsonResponse({"Bien":"Se a realizado el prestamo de forma exitosa"}, safe=False)
+        return JsonResponse({"mensaje":"Se a realizado el prestamo de forma exitosa"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def Amortizacion(self, request):
@@ -224,15 +230,15 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
         
         if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
-            return JsonResponse({"error": "El saldo absoluto es menos que la amortización"}, safe=False)
+            return JsonResponse({"mensaje": "El saldo absoluto es menos que la amortización"}, safe=False)
         
         print("Dinero de turno = ", turno.DineroEfectivo)
 
         if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
-            return JsonResponse({"error": "No tienes la cantidad requerida para esta accion"}, safe=False)
+            return JsonResponse({"mensaje": "No tienes la cantidad requerida para esta accion"}, safe=False)
 
         if jsonPrestamo["Amortizacion"] <= 0:
-            return JsonResponse({"error": "Cantidad no valida"}, safe=False)
+            return JsonResponse({"mensaje": "Cantidad no valida"}, safe=False)
 
         prestamo.AbonoCapital = jsonPrestamo["Amortizacion"] + prestamo.AbonoCapital
 
@@ -249,7 +255,7 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonPrestamo["Amortizacion"])
         turno.save()
 
-        return JsonResponse({"Bien":"Se realizo la amoritizacion de forma correcta"}, safe=False)
+        return JsonResponse({"mensaje":"Se realizo la amoritizacion de forma correcta"}, safe=False)
     
     @action(methods=['get', 'post'], detail=False)
     def prestamosActuales(self, request):
@@ -336,7 +342,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         compania = TipoInversiones.objects.filter(id=jsonInversion["InversionID"]).first()
 
         if turno.DineroEfectivo < Decimal(jsonInversion['Cantidad']):
-            return JsonResponse({"error": "No cuentas con el dinero para realizar esta accion"}, safe=False)
+            return JsonResponse({"mensaje": "No cuentas con el dinero para realizar esta accion"}, safe=False)
 
         rangoRendimiento = (compania.RangoRendimiento).split(" ")
         limite_inferior = float(rangoRendimiento[0])
@@ -348,7 +354,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonInversion['Cantidad'])
         turno.save()
 
-        return JsonResponse({"Bien":"Se realizo la nueva inversion de forma exitosa"}, safe=False)
+        return JsonResponse({"mensaje":"Se realizo la nueva inversion de forma exitosa"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def agregarDinero(self, request):
@@ -361,10 +367,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
         
         if jsonInversion["Cantidad"] > turno.DineroEfectivo:
-            return JsonResponse({"error":"No cuentas con la cantidad de dinero para realizar esta accion"}, safe=False)
+            return JsonResponse({"mensaje":"No cuentas con la cantidad de dinero para realizar esta accion"}, safe=False)
 
         if jsonInversion["Cantidad"] <= 0:
-            return JsonResponse({"error":"Cantidad no valida"}, safe=False)
+            return JsonResponse({"mensaje":"Cantidad no valida"}, safe=False)
 
         inversion.SaldoAportacion = inversion.SaldoAportacion + jsonInversion["Cantidad"]
         inversion.SaldoActual = inversion.SaldoActual + jsonInversion["Cantidad"]
@@ -373,7 +379,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonInversion["InversionID"])
         turno.save()
         
-        return JsonResponse({"Bien": "Se realizo la transaccion de forma correcta"}, safe=False)
+        return JsonResponse({"mensaje": "Se realizo la transaccion de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarDinero(self, request):
@@ -385,10 +391,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
 
         if jsonInversion["Cantidad"] >= inversion.SaldoActual:
-            return JsonResponse({"error":"No cuentas con suficiente dinero para retirar esta cantidad"}, safe=False)
+            return JsonResponse({"mensaje":"No cuentas con suficiente dinero para retirar esta cantidad"}, safe=False)
 
         if jsonInversion["Cantidad"] <= 0:
-            return JsonResponse({"error":"Cantidad no valida"}, safe=False)
+            return JsonResponse({"mensaje":"Cantidad no valida"}, safe=False)
 
         inversion.Aportacion = inversion.Aportacion + jsonInversion["Cantidad"]
         inversion.SaldoActual = inversion.SaldoActual - Decimal(jsonInversion["Cantidad"])
@@ -397,7 +403,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(jsonInversion["Cantidad"])
         turno.save()
         
-        return JsonResponse({"Bien": "La transaccion se realizo de forma correcta"}, safe=False)
+        return JsonResponse({"mensaje": "La transaccion se realizo de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarAccion(self, request):
@@ -412,7 +418,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        return JsonResponse({"Bien": "Se retiro la accion de forma correcta"}, safe=False)
+        return JsonResponse({"mensaje": "Se retiro la accion de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarInversionPersonal(self, request):
@@ -427,7 +433,7 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        return JsonResponse({"Bien": "Se retiro la accion de forma correcta"}, safe=False)
+        return JsonResponse({"mensaje": "Se retiro la accion de forma correcta"}, safe=False)
 
 ###################################################################
 
@@ -448,34 +454,34 @@ class PortafolioViewSet(viewsets.ModelViewSet):
         inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user.id)
         inversionPregunta = InversionPregunta.objects.filter(User = user.id)
 
-        portafolio = []
+        portafolio = {'Egresos':[], 'Ingresos':[]}
 
-        portafolio.append({"Tipo":"Ingreso", "Nombre":"Sueldo","Cantidad":turno.Sueldo, "Periodo":"Mensual"})
+        portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":"Sueldo","Cantidad":turno.Sueldo, "Periodo":"Mensual"})
 
         for prestamo in prestamos:
             nombrePrestamo = TipoPrestamo.objects.filter(idPrestamo = prestamo.idPrestamo.id).first()
             nombre = "Prestamo " + str(nombrePrestamo.TipoPrestamo)
-            portafolio.append({"Tipo":"Egreso", "Nombre":nombre, "Cantidad":prestamo.Mensualidad, "Periodo":"Mensual"})
+            portafolio['Egresos'].append({"Tipo":"Egreso", "Nombre":nombre, "Cantidad":prestamo.Mensualidad, "Periodo":"Mensual"})
 
         for inversion in inversiones:
             compania = TipoInversiones.objects.filter(id=inversion.TipoInversion.id).first()
-            portafolio.append({"Tipo":"Ingreso", "Nombre":compania.Inversion, "Cantidad":inversion.SaldoActual, "Periodo":"Activo"})
+            portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":compania.Inversion, "Cantidad":inversion.SaldoActual, "Periodo":"Activo"})
 
         for ingreso in ingresos:
             periodo = Periodo.objects.filter(Turnos=ingreso.TurnosEsperar).first()
-            portafolio.append({"Tipo":"Ingreso", "Nombre":ingreso.Descripcion, "Cantidad":ingreso.Cantidad, "Periodo":periodo.TipoPeriodo})
+            portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":ingreso.Descripcion, "Cantidad":ingreso.Cantidad, "Periodo":periodo.TipoPeriodo})
 
         for egreso in egresos:
             periodo = Periodo.objects.filter(Turnos=egreso.TurnosEsperar).first()
-            portafolio.append({"Tipo":"Egreso", "Nombre":egreso.Descripcion, "Cantidad":egreso.Cantidad, "Periodo":periodo.TipoPeriodo})
+            portafolio['Egresos'].append({"Tipo":"Egreso", "Nombre":egreso.Descripcion, "Cantidad":egreso.Cantidad, "Periodo":periodo.TipoPeriodo})
 
         for invercionAfe in inversionesAfecta:
             periodo = Periodo.objects.filter(Turnos=invercionAfe.TurnosEsperar).first()
-            portafolio.append({"Tipo":"Ingreso", "Nombre":invercionAfe.Descripcion, "Cantidad":invercionAfe.Cantidad, "Periodo":periodo.TipoPeriodo})
+            portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":invercionAfe.Descripcion, "Cantidad":invercionAfe.Cantidad, "Periodo":periodo.TipoPeriodo})
             
         for inversionPreg in inversionPregunta:
             tipoInversion = TipoPregunta.objects.filter(id=inversionPreg.TipoInversion.id).first()
-            portafolio.append({"Tipo":"Ingreso", "Nombre":tipoInversion.TipoPregunta, "Cantidad":inversionPreg.SaldoActual, "Periodo":"Activo"})
+            portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":tipoInversion.TipoPregunta, "Cantidad":inversionPreg.SaldoActual, "Periodo":"Activo"})
         return JsonResponse(portafolio, safe=False)
 
     
