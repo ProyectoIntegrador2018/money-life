@@ -215,7 +215,7 @@ export class HomeComponent implements OnInit {
     this.questionsService.questionSelected(questionID).subscribe(
       resp => {
         if (resp.mensaje) {
-          window.alert(resp.mensje);
+          window.alert(resp.mensaje);
         } else {
           this.turn = resp[0] as Turn;
           this.refreshTurn();
@@ -404,7 +404,7 @@ export class HomeComponent implements OnInit {
         this.dataTitle = this.microEvent;
         break;
     }
-    this.openModal = true;
+    this.openModal = true; //Checar 
   }
   modalActions(response: ModalResponse): void {
     switch(response.innerName) {
