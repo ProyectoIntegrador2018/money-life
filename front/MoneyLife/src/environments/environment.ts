@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // apiEndPoint:'',
-  apiEndPoint: 'https://c3a6a203bf9f.ngrok.io/'
+  apiEndPoint: 'https://112708a3b3ba.ngrok.io/'
   // apiEndPoint: 'https://moneylifev1.azurewebsites.net/'
   // apiEndPoint: 'http://localhost:8000/'
 };
