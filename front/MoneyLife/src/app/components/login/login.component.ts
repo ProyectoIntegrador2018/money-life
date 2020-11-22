@@ -59,24 +59,13 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.logInForm.status === 'VALID') {
-<<<<<<< HEAD
-      // TODO: call services to make log in
-      this.inputLogin.username = this.logInForm.controls.user.value
-      this.inputLogin.password = this.logInForm.controls.password.value
 
-      this.loginService.onLogin(this.inputLogin).subscribe(
-        (resp) => {
-          console.log(resp);
-        },
-        (error) => console.log('error', error)
-=======
       this.loginService.login(this.logInForm.value).subscribe(
         resp => {
           this.setUser(resp as User);
         }, error => {
           //TODO: Alert error
         }
->>>>>>> cf3eb9f936013ff426354d5a0bd66a3926816848
       );
     } else {
       if (this.logInForm.controls.username.status === 'INVALID') {
