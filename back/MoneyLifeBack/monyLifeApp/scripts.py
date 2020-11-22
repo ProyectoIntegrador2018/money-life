@@ -576,7 +576,6 @@ def inversionesTurnos(user, turno, inversiones):
             inversion.EventoExterno == 0
             inversion.save()
 
-        ###### ver el video del profe para entender bien como funciona ######
         inversion.TasaRendimiento = tasaRendimiento
         inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.TasaRendimiento))
         inversion.save()
