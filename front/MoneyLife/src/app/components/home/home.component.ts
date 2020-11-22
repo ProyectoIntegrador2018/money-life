@@ -48,7 +48,6 @@ export class HomeComponent implements OnInit {
   questionsGoods: InitQuestion[] = [];
   questionsWork: InitQuestion[] = [];
   myInv: MyInvestments[] = [];
-  personalInvestments: PersonalInvestments[] = [];
 
   microEvent: ModalTab[] = [
     {
@@ -91,12 +90,12 @@ export class HomeComponent implements OnInit {
     }
   ]
   newActionsBtn: Button = {
-    name: 'Inversion en bolsa',
+    name: 'Inversión en bolsa',
     innerName: 'newActions',
   };
   newActions: ModalTab[] = [
     {
-      name: 'Inversion en bolsa',
+      name: 'Inversión en bolsa',
       active: true,
       internalName: 'newActions',
       position: 0
@@ -120,7 +119,7 @@ export class HomeComponent implements OnInit {
   };
   myActions: ModalTab[] = [
     {
-      name: 'Inversion en bolsa',
+      name: 'Inversión en bolsa',
       active: true,
       internalName: 'myActions',
       position: 0
@@ -217,7 +216,7 @@ export class HomeComponent implements OnInit {
         if (resp.mensaje) {
           window.alert(resp.mensaje);
         } else {
-          this.turn = resp[0] as Turn;
+          // this.turn = resp[0] as Turn;
           this.refreshTurn();
           this.activeCards = false;
         }
@@ -230,6 +229,8 @@ export class HomeComponent implements OnInit {
     this.actionService.getCatalogue().subscribe(
       resp => {
         this.dataModal = resp as SharesStock[];
+        this.dataTitle = this.newActions;
+        this.openModal = true;
       }, error => {
         //TODO: alert
       }
@@ -249,6 +250,8 @@ export class HomeComponent implements OnInit {
     this.loanService.getCatalogue().subscribe(
       resp => {
         this.dataModal = resp as Loans[];
+        this.dataTitle = this.newLoan;
+        this.openModal = true;
       }, error => {
         //TODO: alert
       }
@@ -268,6 +271,7 @@ export class HomeComponent implements OnInit {
     this.actionService.myActions().subscribe(
       resp => {
         this.myInv = resp as MyInvestments[]; 
+        this.getOwnInvestment();
       }, error => {
         //TODO: alert
       }
@@ -306,7 +310,12 @@ export class HomeComponent implements OnInit {
   getOwnInvestment(): void {
     this.actionService.myOwnInvestmentFromQuestions().subscribe(
       resp => {
-        this.personalInvestments = resp as PersonalInvestments[];
+        this.dataModal = [{
+          shared: this.myInv as MyInvestments[],
+          own: resp as PersonalInvestments[]
+        }];
+        this.dataTitle = this.myActions;
+        this.openModal = true;
       }, error => {
         //TODO: alert
       }
@@ -326,6 +335,8 @@ export class HomeComponent implements OnInit {
     this.loanService.seeMyLoans().subscribe(
       resp => {
         this.dataModal = resp as MyLoans[];
+        this.dataTitle = this.myLoansTitle;
+        this.openModal = true;
       }, error => {
         //TODO: alert
       }
@@ -345,6 +356,8 @@ export class HomeComponent implements OnInit {
     this.turnService.financialPortfolio().subscribe(
       resp => {
         this.dataModal = resp as Portfolio[];
+        this.dataTitle = this.portfolio;
+        this.openModal = true;
       }, error => {
         //TODO: alert
       }
@@ -373,38 +386,29 @@ export class HomeComponent implements OnInit {
     switch(activateModal.innerName) {
       case 'portfolio': 
         this.financialPortfolio();
-        this.dataTitle = this.portfolio;
         break;
       case 'newActions':
         this.catalogueActions();
-        this.dataTitle = this.newActions;
         break;
       case 'newLoan':
         this.catalogueLoan();
-        this.dataTitle = this.newLoan;
         break;
       case 'myActions':
         this.myInvestments();
-        this.getOwnInvestment();
-        this.dataModal = [{
-          shared: this.myInv as MyInvestments[],
-          own: this.personalInvestments as PersonalInvestments[]
-        }];
-        this.dataTitle = this.myActions;
         break;
       case 'myLoans': 
         this.seeMyLoans();
-        this.dataTitle = this.myLoansTitle;
         break;
       case 'endGame':
         this.dataTitle = this.endTurn;
+        this.openModal = true;
         break;
       case 'microEvent':
         this.dataModal = [this.eventMicro];
         this.dataTitle = this.microEvent;
+        this.openModal = true;
         break;
     }
-    this.openModal = true; //Checar 
   }
   modalActions(response: ModalResponse): void {
     switch(response.innerName) {

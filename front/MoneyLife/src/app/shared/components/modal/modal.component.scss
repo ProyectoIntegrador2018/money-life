@@ -152,7 +152,7 @@
         #content {
           margin: 0 auto;
           min-width: 850px;
-          min-height: 500px;
+          min-height: 555px;
           overflow: hidden;
           position: relative;
           border-radius: 0 0 5px 5px;
@@ -241,11 +241,14 @@
           tbody {
             overflow-y: visible;
           }
+          .adjust {
+            max-height: 234px !important;
+          }
           .aa_htmlTable{
             z-index: 1;
             width: 100%;
             margin: auto;
-            max-height: 500px;
+            max-height: 434px;
             position: relative;
             overflow-y: scroll; 
           }

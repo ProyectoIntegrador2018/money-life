@@ -18,12 +18,11 @@ export class BoxComponent implements OnInit {
   ngOnInit(): void {
   }
   activateBox(): void {
-    this.act.emit(false);
     this.active = true;
+    this.act.emit(false);
     setTimeout(_ => {
       this.active = false;
-      this.act.emit(true);
-    }, 2000);
+    }, 1000);
   }
 
 }
