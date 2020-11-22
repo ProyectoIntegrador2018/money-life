@@ -536,10 +536,13 @@ def prestamosTurnos(user, turno, prestamos):
         if prestamo.Frecuencia <= 0:
             turno.DineroEfectivo = turno.DineroEfectivo - prestamo.Mensualidad
             tipoPrestamo = prestamo.idPrestamo
-            
             tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = str(tipoPrestamo)).first()
 
-            prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - prestamo.Mensualidad
+            interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
+            interes = float(interes)/100
+            interesMensual = prestamo.SaldoAbsoluto * Decimal(interes/12)
+
+            prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - (prestamo.Mensualidad - interesMensual)
 
             if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
                 prestamo.Mensualidad = prestamo.SaldoAbsoluto
@@ -548,7 +551,7 @@ def prestamosTurnos(user, turno, prestamos):
             interes = float(interes)/100
             interesMensual = prestamo.SaldoAbsoluto * Decimal(interes/12)
 
-            prestamo.Frecuencia = 4
+            prestamo.Frecuencia = 3
             prestamo.Interes = interesMensual
             prestamo.save()
 
@@ -576,7 +579,6 @@ def inversionesTurnos(user, turno, inversiones):
             inversion.EventoExterno == 0
             inversion.save()
 
-        ###### ver el video del profe para entender bien como funciona ######
         inversion.TasaRendimiento = tasaRendimiento
         inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.TasaRendimiento))
         inversion.save()
