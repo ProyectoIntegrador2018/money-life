@@ -16,7 +16,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         user = User.objects.create_user(**validate_data)
         
         #Crear turno actual del usuario
-        newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=10000, Ingresos=1000, Egresos=0, Sueldo=10000, User=user)
+        newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=20000, Ingresos=1000, Egresos=0, Sueldo=15000, User=user)
         newTurno.save()
 
         #Crear relacion con todos los eventos
@@ -32,7 +32,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             user_pregu.save()
         
         #Crear afecta de sueldo
-        user_afecta = Afecta_user(Afecta="SueldoReal", Descripcion="Eres empleado", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=10000, Duracion=99999999)
+        user_afecta = Afecta_user(Afecta="SueldoReal", Descripcion="Eres empleado", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=newTurno.Sueldo, Duracion=99999999)
         user_afecta.save()
 
         return user

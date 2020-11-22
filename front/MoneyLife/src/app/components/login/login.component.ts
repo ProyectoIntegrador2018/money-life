@@ -59,6 +59,7 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.logInForm.status === 'VALID') {
+
       this.loginService.login(this.logInForm.value).subscribe(
         resp => {
           this.setUser(resp as User);
