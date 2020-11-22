@@ -21,7 +21,6 @@ export class InitTurnService {
   }
 
   initTurn(): Observable<any> { // Called at the start of a new turn
-
     return this.base.post(`turno/inicio/`, this.getUser());
   }
   
@@ -31,5 +30,8 @@ export class InitTurnService {
   financialPortfolio(): Observable<any> {
     return this.base.post(`portafolio/financiero/`, this.getUser());
 
+  }
+  eraseGame(): Observable<any> {
+    return this.base.put(`terminar/juego/`, this.getUser());
   }
 }

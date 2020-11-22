@@ -1,6 +1,6 @@
 <section class="container">
-    <h1>Nuevo turno</h1>
     <div class="box" (click)="activateBox()" [ngClass]="{'animate-box': active}">
+        <!-- <h1>Nuevo turno</h1> -->
         <div class="side-1">
             <div class="side inner-side flap-1" [ngClass]="{'animate-flap1': active}"></div>
             <div class="side inner-side flap-2" [ngClass]="{'animate-flap2': active}"></div>
@@ -11,5 +11,6 @@
         <div class="side side-4"></div>
         <div class="side side-5"></div>
         <div class="side side-6"></div>
+        <app-button [ob]="newTurn" class="pos" [color]="'yellow'" (pressed)="$event"></app-button>
     </div>
 </section>

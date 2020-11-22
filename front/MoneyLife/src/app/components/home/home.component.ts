@@ -1,5 +1,3 @@
-// TODO: meter las igualaciones dentro de las funciones
-// TODO: identificar cuando se llama a algo
 import { Component, OnInit } from '@angular/core';
 import { KeysDataUser } from 'src/app/auth/keys-data';
 import { Router } from '@angular/router';
@@ -9,6 +7,7 @@ import { QuestionsService } from 'src/app/flip-card/services/questions.service';
 import { LoanService } from 'src/app/loan/services/loan.service';
 import { ActionsService } from '../services/actions.service';
 import { InitTurnService } from '../services/turn.service';
+import { HappinessService } from 'src/app/happiness/services/happiness.service';
 /** Interfaces */
 import { Button } from 'src/app/shared/interfaces/button';
 import { ModalTab } from 'src/app/shared/interfaces/modal-tab';
@@ -22,6 +21,7 @@ import { PersonalInvestments } from 'src/app/components/interfaces/personal-inve
 import { MyLoans } from 'src/app/loan/interfaces/my-loans';
 import { Portfolio } from 'src/app/components/interfaces/portfolio';
 import { ModalResponse } from 'src/app/shared/interfaces/modal-response';
+import { Happiness } from 'src/app/happiness/interfaces/happiness';
 
 
 @Component({
@@ -30,7 +30,7 @@ import { ModalResponse } from 'src/app/shared/interfaces/modal-response';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
-  show = true;
+  show = false;
   activeCards = false;
   openModal = false;
   name = '';
@@ -53,17 +53,40 @@ export class HomeComponent implements OnInit {
   personalInvestments: PersonalInvestments[] = [];
   myLoans: MyLoans[] = [];
   portfolioBack: Portfolio[] = [];
-  endTurn: Button = {
-    name: 'Cerrar sesión',
+
+  microEvent: ModalTab[] = [{
+    name: 'Evento Micro',
+    active: true,
+    internalName: 'microEvent',
+    position: 0
+  }];
+  happiness: ModalTab[] = [
+    {
+      name: 'Felicidad',
+      active: true,
+      internalName: 'happiness',
+      position: 0
+    }
+  ];
+  endTurnBtn: Button = {
+    name: 'Salir',
     innerName: 'endGame'
   }
+  endTurn: ModalTab[] = [
+    {
+      name: 'Salir',
+      active: true,
+      internalName: 'endGame',
+      position: 0
+    }
+  ];
   portfolioBtn: Button = {
-    name: 'Portafolio',
+    name: 'Flujo de efectivo',
     innerName: 'portfolio'
   };
   portfolio: ModalTab[] = [
     {
-      name: 'Portafolio',
+      name: 'Flujo de efectivo',
       active: true,
       internalName: 'portfolio',
       position: 0
@@ -138,56 +161,48 @@ export class HomeComponent implements OnInit {
     private questionsService: QuestionsService,
     private loanService: LoanService,
     private actionService: ActionsService,
-    private turnService: InitTurnService
+    private turnService: InitTurnService,
+    private happinessService: HappinessService
     ) { }
 
-    ngOnInit(): void {
-      this.initTurn(); // Init Event, Turn, Init Question DEJAR
-    // this.refreshTurn(); // Turn
-    // this.sellAction(); // string Bien or error
-    // this.sellOwnInvestments(); // string Bien or error
-    // this.getMoneyfromAction(); // string error
-    // this.catalogueActions(); // SharesStock DEJAR
-    // this.investMoreMoney(); // string Bien or error
-    // this.selectedAction(); // string Bien or error
-    // this.catalogueLoan(); // Loan DEJAR
-    // this.selectedLoan(); // String Bien or error
-    // this.seeMyLoans(); // MyLoans
-    // this.reduceLoan(); // string error or Bien
-    // this.questionSelected(); //Turn XXX
+  ngOnInit(): void {
+    this.initTurn(); // Init Event, Turn, Init Question DEJAR
   }
   initTurn(): void {
     this.eventService.initTurnEvent().subscribe(
       resp => {
         if (resp) {
-          const micro = resp.filter((res: InitEvent) => res.TipoEvento === 'Micro')[0];
-          const macro = resp.filter((res: InitEvent) => res.TipoEvento === 'Macro')[0];
-          this.eventMicro = (micro) ? micro : null;
-          this.eventMacro = (macro) ? macro : [];
+          const micro = resp.filter((res: InitEvent) => res.TipoEvento === 'Micro')[0] as InitEvent;
+          const macro = resp.filter((res: InitEvent) => res.TipoEvento === 'Macro')[0] as InitEvent;
+          if (micro) {
+            this.eventMicro = micro;
+            this.show = true;
+          } else {
+            this.eventMicro = null;
+            this.show = false;
+          }
+          this.eventMacro = (macro) ? macro : null;
+          this.turnService.initTurn().subscribe(
+            resp => {
+              this.turn = resp[0];
+            }, error => {
+              //TODO: alert
+          });
         }
     }, error => {
       // TODO: Alert
     });
-    this.turnService.initTurn().subscribe(
-      resp => {
-        this.turn = resp[0];
-      }, error => {
-        //TODO: alert
-    });
+
     this.questionsService.initTurnQuestions().subscribe(
       resp => {
         this.questionsInv = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Inversion');
         this.questionsGoods = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Bienes Personales'); 
         this.questionsFun = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Diversion'); 
         this.questionsWork = resp.filter((r: InitQuestion) => r.TipoPregunta === 'Laboral');
+        this.activeCards = true;
       }, error => {
         //TODO: alert
     });
-    this.financialPortfolio(); //PortfolioBack DEJAR
-    this.getOwnInvestment(); //PersonalInvestments DEJAR
-    this.myInvestments(); //MyInvestments DEJAR
-    this.catalogueLoan(); // Loan DEJAR?
-    this.catalogueActions(); // SharesStock DEJAR
   }
   refreshTurn(): void {
     this.turnService.refreshTurn().subscribe(
@@ -197,11 +212,6 @@ export class HomeComponent implements OnInit {
         //TODO: alert
       }
     );
-    this.financialPortfolio(); //PortfolioBack DEJAR
-    this.getOwnInvestment(); //PersonalInvestments DEJAR
-    this.myInvestments(); //MyInvestments DEJAR
-    this.catalogueLoan(); // Loan DEJAR?
-    this.catalogueActions(); // SharesStock DEJAR
   }
   questionSelected(questionID: number): void {
     this.questionsService.questionSelected(questionID).subscribe(
@@ -228,7 +238,7 @@ export class HomeComponent implements OnInit {
     this.actionService.investToNewAction(actionID, qty).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -250,7 +260,7 @@ export class HomeComponent implements OnInit {
     this.loanService.selectedLoan(loanID, totalValue, hitch).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -270,7 +280,7 @@ export class HomeComponent implements OnInit {
     this.actionService.investToOwnAction(actionID, qty).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -281,7 +291,7 @@ export class HomeComponent implements OnInit {
     this.actionService.getMoneyFromAction(actionID, qty).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -292,7 +302,7 @@ export class HomeComponent implements OnInit {
     this.actionService.sellAction(actionID).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -312,7 +322,7 @@ export class HomeComponent implements OnInit {
     this.actionService.sellOwnInvestments(actionID).subscribe(
       resp => {
         window.alert(resp.mensaje);
-        console.log(resp);
+        // console.log(resp);
         this.refreshTurn();
       }, error => {
         //TODO: alert
@@ -323,7 +333,7 @@ export class HomeComponent implements OnInit {
     this.loanService.seeMyLoans().subscribe(
       resp => {
         // this.myLoans = resp;
-        console.log(resp);
+        // console.log(resp);
         this.dataModal = resp;
       }, error => {
         //TODO: alert
@@ -333,7 +343,7 @@ export class HomeComponent implements OnInit {
   reduceLoan(loanID: number, qty: number): void {
     this.loanService.payLoan(loanID, qty).subscribe(
       resp => {
-        console.log(resp);
+        // console.log(resp);
         window.alert(resp.mensaje);
         this.refreshTurn();
       }, error => {
@@ -351,6 +361,17 @@ export class HomeComponent implements OnInit {
       }
     );
   }
+  showHappiness(): void {
+    this.happinessService.getHappiness().subscribe(
+      resp => {
+        this.dataModal = resp as Happiness[];
+        this.dataTitle = this.happiness;
+        this.openModal = true;
+      }, error => {
+        //TODO: alert
+      }
+    );
+  }
   close(action: boolean): void { // Notifications
     this.show = action;
   }
@@ -360,7 +381,6 @@ export class HomeComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
   openModalFun(activateModal: Button): void { // Modal
-    console.log(activateModal);
     switch(activateModal.innerName) {
       case 'portfolio': 
         this.financialPortfolio();
@@ -390,11 +410,16 @@ export class HomeComponent implements OnInit {
         this.seeMyLoans();
         this.dataTitle = this.myLoansTitle;
         break;
+      case 'endGame':
+        this.dataTitle = this.endTurn;
+      case 'microEvent':
+        this.dataModal = [this.eventMicro];
+        this.dataTitle = this.microEvent;
     }
     this.openModal = true;
   }
   modalActions(response: ModalResponse): void {
-    console.log(response);
+    // console.log(response);
     switch(response.innerName) {
       case 'questions': 
         this.questionSelected(response.data[0].Pregunta_id);
@@ -420,6 +445,18 @@ export class HomeComponent implements OnInit {
         break;
       case 'myLoans':
         this.reduceLoan(response.data.PrestamoID, response.qty);
+        break;
+      case 'endGameSave':
+        this.closeGame();
+        break;
+      case 'endGameErase':
+        this.turnService.eraseGame().subscribe(
+          resp => {
+            console.log(resp);
+            this.closeGame();
+          }, error => {
+            // alert
+          });
         break;
     }
     this.openModal = response.flag;

@@ -8,6 +8,7 @@ import { Button } from '../../interfaces/button';
 })
 export class ButtonComponent implements OnInit {
   @Input() ob: Button;
+  @Input() color: string;
   @Output() pressed: EventEmitter<Button> = new EventEmitter<Button>();
   
 
