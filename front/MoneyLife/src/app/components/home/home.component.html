@@ -107,7 +107,7 @@
         </flip-card-back>
       </flip-card>
     </div>
-    <app-box (act)="resetCards($event)" (click)="initTurn()"></app-box>
+    <app-box (act)="resetCards($event); initTurn()"></app-box>
   </div>
   <div class="btn-right">
     <app-button [ob]="myLoansBtn" [color]="'blue'" (pressed)="openModalFun($event)"></app-button>

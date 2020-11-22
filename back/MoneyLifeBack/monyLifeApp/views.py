@@ -216,6 +216,9 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = jsonPrestamo["PrestamoID"]).first()
         cantidadPrestada = jsonPrestamo["ValorTotal"] - jsonPrestamo["Enganche"]
 
+        if Decimal(jsonPrestamo["Enganche"]) >= turno.DineroEfectivo:
+            return JsonResponse({"mensaje": "No cuentas con el dinero para realizar esta acción"}, safe=False)
+
         interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
         interes = float(interes)/100
         anos = (tipoPrestamo.Duracion).split(" ")
@@ -223,10 +226,10 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         pagoMensual = cantidadPrestada/((1 - (pow((1 + (interes/12)), (-(anos*12)))))/(interes/12))
         interesMensual = cantidadPrestada*(interes/12)
 
-        if turno.Ingresos < pagoMensual:
+        if (turno.Ingresos - turno.Egresos) < pagoMensual:
             return JsonResponse({"mensaje": "No cuentas con los ingresos necesarios para realizar este pedido"}, safe=False)
 
-        prestamoUser = Prestamo(User=user, idPrestamo=tipoPrestamo, ValorTotal=jsonPrestamo["ValorTotal"], CantidadPrestada=cantidadPrestada, Enganche=jsonPrestamo["Enganche"], Frecuencia=4, Amortizacion=0, Interes=interesMensual, Mensualidad=pagoMensual, AbonoCapital=0, SaldoAbsoluto=cantidadPrestada )
+        prestamoUser = Prestamo(User=user, idPrestamo=tipoPrestamo, ValorTotal=jsonPrestamo["ValorTotal"], CantidadPrestada=cantidadPrestada, Enganche=jsonPrestamo["Enganche"], Frecuencia=3, Amortizacion=0, Interes=interesMensual, Mensualidad=pagoMensual, AbonoCapital=0, SaldoAbsoluto=cantidadPrestada )
         prestamoUser.save()
 
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(jsonPrestamo["ValorTotal"])
@@ -253,16 +256,18 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         if jsonPrestamo["Amortizacion"] <= 0:
             return JsonResponse({"mensaje": "Cantidad no valida"}, safe=False)
 
-        prestamo.AbonoCapital = jsonPrestamo["Amortizacion"] + prestamo.AbonoCapital
+        prestamo.AbonoCapital = Decimal(jsonPrestamo["Amortizacion"]) + prestamo.AbonoCapital
 
-        prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - jsonPrestamo["Amortizacion"]
+        prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - Decimal(jsonPrestamo["Amortizacion"])
 
         if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
             prestamo.Mensualidad = prestamo.SaldoAbsoluto
 
         prestamo.save()
 
-        if prestamo.SaldoAbsoluto <= 0:
+        print("Saldo Absoluto = ",prestamo.SaldoAbsoluto)
+
+        if prestamo.SaldoAbsoluto <= 1:
             prestamo.delete()
         
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonPrestamo["Amortizacion"])
@@ -288,24 +293,15 @@ class PrestamoViewSet(viewsets.ModelViewSet):
             anos = int(anos[0])
             pagoMensual = float(prestamo.Mensualidad)
             interesMensual = float(prestamo.SaldoAbsoluto)*(interes/12)
-            print("////////////////////////")
-            print("Intereses Porcentaje = ", tipoPrestamo.TazaInteres)
-            print("InteresMensual = ", interesMensual)
-            print("Mensualidad = ", pagoMensual)
-            print("Saldo Absoluto = ",prestamo.SaldoAbsoluto)
 
             mesesRestantes = 0
             acomulado = 0
             while acomulado + 5 <= float(prestamo.SaldoAbsoluto):
                 acomulado = acomulado + (pagoMensual - interesMensual)
                 interesMensual = float(float(prestamo.SaldoAbsoluto) - acomulado)*(interes/12)
-                print("Acomulado = ",acomulado)
-                print("Cont = ",mesesRestantes)
                 mesesRestantes = mesesRestantes + 1
-
-            print("Meses de pago = ", mesesRestantes)
             ################################################################################
-            #mesesRestantes = math.ceil(prestamo.SaldoAbsoluto/prestamo.Mensualidad)
+
             prestamosActuales.append({'PrestamoID':prestamo.id, 'TipoPrestamo':tipoPrestamo.TipoPrestamo, 'Mensualidad':prestamo.Mensualidad, "SaldoAbsoluto":prestamo.SaldoAbsoluto, "MesesRestantes":mesesRestantes})
         
         return JsonResponse(prestamosActuales, safe=False)

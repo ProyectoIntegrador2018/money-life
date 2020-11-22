@@ -5,9 +5,11 @@
 export const environment = {
   production: false,
   // apiEndPoint:'',
-  // apiEndPoint: 'https://532a501ccd0f.ngrok.io/'
+  //apiEndPoint: 'https://c3a6a203bf9f.ngrok.io/'
+  // apiEndPoint: 'https://moneylifev1.azurewebsites.net/'
   apiEndPoint: 'http://localhost:8000/'
-}
+};
+
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

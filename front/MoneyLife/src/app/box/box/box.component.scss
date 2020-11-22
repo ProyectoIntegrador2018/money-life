@@ -25,9 +25,6 @@ $height: 100px;
     position: absolute;
   }
 }
-.box:hover {
-  cursor: pointer;
-}
 .animate-box {
   animation: spin 3s infinite linear;
   animation-fill-mode: forwards;
