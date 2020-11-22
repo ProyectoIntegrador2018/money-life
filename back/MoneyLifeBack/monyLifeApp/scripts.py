@@ -19,6 +19,8 @@ def modifyEvento(user, eventos):
                 Evento_User.objects.filter(User=user.id, Evento=evento['Evento_id']).update(Frecuencia=changefrecuencia.Frecuencia - 1)
     
 def eventoAfecta(user, eventos):
+    afectaList = []
+
     if eventos != None:
         for evento in eventos:
             if evento != {}:
@@ -29,15 +31,26 @@ def eventoAfecta(user, eventos):
                         duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
                         afecta_usuario = Afecta_user(User=user, Descripcion=evento["Descripcion"], Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
                         afecta_usuario.save()
-"""
+                        afectaList.append(afecta_usuario.id)
+    return afectaList
+
 def getAfectaEvento(response):
     print(response[0])
 
     for i in response:
         if i != {}:
             i['Afecta'] = []
-                afectas = Evento_Afecta.objects.filter()
-"""
+            evento = Evento.objects.filter(id = i["Evento_id"]).first()
+            afectas = Evento_Afecta.objects.filter(Evento = evento)
+            for afecta in afectas:
+                periodo = str(afecta.Periodo)
+                if afecta.Periodo.Turnos < 0:
+                    periodo = "Exclusivo"
+                duracion = afecta.Duracion
+                if afecta.Duracion > 1000:
+                    duracion = "Infinito"
+                i['Afecta'].append({"Afecta": afecta.Afecta.TipoAfect, "Cantidad": afecta.Cantidad, "Periodo":periodo, "Duracion":duracion})
+
 
 def verificarRequisitos(id, turno, flag_tipo):
     if(flag_tipo == 'Pregunta'):
@@ -228,7 +241,9 @@ def preguntaAfecta(user, pregunta):
                 afecta_usuario.save()
                 afectaList.append(afecta_usuario.id)
         else:
-            if str(afecta.Afecta) == 'DineroEfectivo':
+            print("Afecta = ", afecta.Afecta)
+            print("Duracion = ", afecta.Periodo.Turnos)
+            if str(afecta.Afecta) == 'DineroEfectivo' and afecta.Periodo.Turnos != -1:
                 rangoRendimiento = (tipoInversion.TasaRendimiento).split(" ")
                 limite_inferior = float(rangoRendimiento[0])
                 limite_superior = float(rangoRendimiento[2])
@@ -241,6 +256,7 @@ def preguntaAfecta(user, pregunta):
                 afecta_usuario = Afecta_user(User=user, Descripcion=pregunta.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
                 afecta_usuario.save()
                 afectaList.append(afecta_usuario.id)
+    print("////////////////////////////////////////////")
     return afectaList
 
 def validarPregunta(user, pregunta):
@@ -249,21 +265,36 @@ def validarPregunta(user, pregunta):
     for afecta in afecta_pregunta:
         duracion = Periodo.objects.filter(TipoPeriodo=afecta.Periodo).first()
         if duracion.Turnos == -1:
-            if afecta.Afecta == 'DineroEfectivo':
-                if turno.DineroEfectivo < afecta.Cantidad:
+            if str(afecta.Afecta) == 'DineroEfectivo':
+                if turno.DineroEfectivo < Decimal(afecta.Cantidad):
                     return False
-            if afecta.Afecta == 'Felicidad':
+            if str(afecta.Afecta) == 'Felicidad':
                 if turno.Felicidad < afecta.Felicidad:
                     return False
-            if afecta.Afecta == 'Egresos':
+            if str(afecta.Afecta) == 'Egresos':
                 if turno.Egresos < afecta.Egresos:
                     return False
-            if afecta.Afecta == 'Ingresos':
+            if str(afecta.Afecta) == 'Ingresos':
                 if turno.Ingresos < afecta.Ingresos:
                     return False
     return True
             
-                    
+def getAfectaPregunta(response):
+    print(response[0])
+
+    for i in response:
+        if i != {}:
+            i['Afecta'] = []
+            pregunta = Preguntas.objects.filter(id = i["Pregunta_id"]).first()
+            afectas = Preguntas_Afecta.objects.filter(Preguntas = pregunta)
+            for afecta in afectas:
+                periodo = str(afecta.Periodo)
+                if afecta.Periodo.Turnos < 0:
+                    periodo = "Exclusivo"
+                duracion = afecta.Duracion
+                if afecta.Duracion > 1000:
+                    duracion = "Infinito"
+                i['Afecta'].append({"Afecta": afecta.Afecta.TipoAfect, "Cantidad": afecta.Cantidad, "Periodo":periodo, "Duracion":duracion})
 
 def afectaInversion(afecta, user):
     listaInversionAfecta = ['Telecomunicaciones', 'Tecnologia', 'Construccion', 'Bienes_Raices']
@@ -315,7 +346,7 @@ def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
             else:
                 pass
 
-    print("SE SELECCIONARON ", len(preguntas), " PREGUNTAS ")
+    #print("SE SELECCIONARON ", len(preguntas), " PREGUNTAS ")
         
 
 def seleccionPregunta(user):
@@ -342,16 +373,14 @@ def seleccionPregunta(user):
 """
 INICIO DE TURNO
 """
-def afectaTurnosPregunta(afectaActions, turno):
+def afectaTurnoinstantaneo(afectaActions, turno):
     for afecta in afectaActions:
-        print("AFECTA  = ",afecta.Afecta)
         afecta.TurnosRestante = afecta.TurnosRestante - 1
         afecta.save()
         if afecta.TurnosRestante <= 0:
             afecta.Duracion = afecta.Duracion - 1
             afecta.save()
             if afecta.TurnosEsperar <= 0:
-                print("SE BORRO AFECTA ", afecta.Afecta)
                 afecta.delete()
             else:
                 if afecta.Cantidad[0] == '%':
@@ -366,9 +395,7 @@ def afectaTurnosPregunta(afectaActions, turno):
                 afecta.TurnosRestante = afecta.TurnosEsperar
                 afecta.save()
                 turno.save()
-                print("Nos quedamos en ",afecta.Afecta)
                 if afecta.Duracion <= 0: 
-                    print("SE BORRO AFECTA ", afecta.Afecta)
                     afecta.delete()
 
 #Se aplican todos los afectas relacionados con el usuario
@@ -376,16 +403,13 @@ def afectaTurnos(user, turno):
     
     afectaActions = Afecta_user.objects.filter(User=user)
     for afecta in afectaActions:
-        print("entro ", afecta.Afecta)
         afecta.TurnosRestante = afecta.TurnosRestante - 1
         afecta.save()
         if afecta.TurnosRestante <= 0:
             afecta.Duracion = afecta.Duracion - 1
             afecta.save()
             if afecta.TurnosEsperar <= 0:
-                print("ENTRO A BORRAR 1 ")
                 afecta.delete()
-                print("SE BORRO AFECTA ", afecta.Afecta)
             else:
                 if afecta.Cantidad[0] == '%':
                     cantidadAfecta = afecta.Cantidad[1:]
@@ -400,9 +424,7 @@ def afectaTurnos(user, turno):
                 afecta.save()
                 turno.save()
                 if afecta.Duracion <= 0: 
-                    print("ENTRO A BORRAR 2 ")
                     afecta.delete()
-                    print("SE BORRO AFECTA ", afecta.Afecta)
                 
 #Es la forma en la que se modifica el turno actual del usuario (Se puede cambiar)   
 def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
@@ -465,13 +487,14 @@ def turnoIngresosEgresos(user, turno):
     inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user)
     inversionPregunta = InversionPregunta.objects.filter(User = user)
     sueldoActual = Afecta_user.objects.filter(User=user, Afecta='SueldoReal').first()
-
-    turnoEgresos = 0
+  
+    turnoEgresos = Decimal(0)
     turnoIngresos = Decimal(sueldoActual.Cantidad)
 
     for prestamo in prestamos:
-        turnoEgresos = turnoEgresos + prestamo.Mensualidad
+        turnoEgresos = turnoEgresos + Decimal(prestamo.Mensualidad)
 
+  
     #No es un ingreso por que no lo recibes mensualmente
     """
     for inversion in inversiones:
@@ -484,17 +507,18 @@ def turnoIngresosEgresos(user, turno):
 
     for egreso in egresos:
         portafolioCantidad = afectaMensual(egreso)
-        turnoEgresos = turnoEgresos + portafolioCantidad
+        turnoEgresos = turnoEgresos + Decimal(portafolioCantidad)
 
     for inversion in inversionesAfecta:
         portafolioCantidad = afectaMensual(inversion)
-        turnoIngresos = turnoEgresos + portafolioCantidad
+        turnoIngresos = turnoIngresos + portafolioCantidad
 
     #No es un ingreso por que no lo recibes mensualmente
     """
     for inversion in inversionPregunta:
         turnoIngresos = turnoIngresos + inversion.SaldoActual
     """
+ 
     turno.Ingresos = turnoIngresos
     turno.Egresos = turnoEgresos
     turno.save()
@@ -502,13 +526,13 @@ def turnoIngresosEgresos(user, turno):
 def afectaMensual(afecta):
     if afecta.TurnosEsperar > 4:
         numDividir = afecta.TurnosEsperar / 4
-        afectaCantidad = afecta.Cantidad / Decimal(numDividir)
+        afectaCantidad = Decimal(afecta.Cantidad) / Decimal(numDividir)
     elif afecta.TurnosEsperar == 2:
-        afectaCantidad = afecta.Cantidad * 2
+        afectaCantidad = Decimal(afecta.Cantidad) * 2
     elif afecta.TurnosEsperar == 1:
-        afectaCantidad = afecta.Cantidad * 4
+        afectaCantidad = Decimal(afecta.Cantidad) * 4
     else :
-        afectaCantidad = afecta.Cantidad
+        afectaCantidad = Decimal(afecta.Cantidad)
     return Decimal(afectaCantidad)
 
 
@@ -566,10 +590,7 @@ def inversionesPreguntasTurnos(user, turno, inversionesPregunta):
         limite_superior = float(rangoRendimiento[2])
         tasaRendimiento = random.uniform(limite_inferior,limite_superior)
 
-        print("EventoExterno = ", inversion.EventoExterno)
-
         if float(inversion.EventoExterno) != 0:
-            print("ENTRA")
             inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.EventoExterno))
             inversion.EventoExterno == 0
             inversion.save()
@@ -578,3 +599,47 @@ def inversionesPreguntasTurnos(user, turno, inversionesPregunta):
         inversion.TazaRendimiento = tasaRendimiento
         inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.TazaRendimiento))
         inversion.save()
+
+###################################################################
+
+###################################################################
+
+def borrarInfoUser(user):
+    prestamos = Prestamo.objects.filter(User=user)
+    afecta = Afecta_user.objects.filter(User=user)
+    turno = Turnos.objects.filter(User=user)
+    inversiones = Inversion.objects.filter(User = user)
+    inversionPregunta = InversionPregunta.objects.filter(User = user)
+    preguntas = Preguntas_User.objects.filter(User = user)
+    eventos = Evento_User.objects.filter(User = user)
+
+
+    eventos.delete()
+    preguntas.delete()
+    inversionPregunta.delete()
+    inversiones.delete()
+    turno.delete()
+    afecta.delete()
+    prestamos.delete()
+
+def reiniciarUser(user):
+
+    #Crear turno actual del usuario
+    newTurno = Turnos(NumeroTurnos=0, Felicidad=50, DineroEfectivo=20000, Ingresos=1000, Egresos=0, Sueldo=15000, User=user)
+    newTurno.save()
+
+    #Crear relacion con todos los eventos
+    eventos = Evento.objects.all()
+    for event in eventos:
+        user_event = Evento_User(User=user, Evento=event, Frecuencia=event.Frecuencia, TipoEvento=event.TipoEvento)
+        user_event.save()
+
+    #Crear relacion con todas las preguntas
+    preguntas = Preguntas.objects.all()
+    for pregu in preguntas:
+        user_pregu = Preguntas_User(User=user, Pregunta=pregu, Frecuencia=pregu.Frecuencia, TipoPreguntas=pregu.TipoPreguntas)
+        user_pregu.save()
+    
+    #Crear afecta de sueldo
+    user_afecta = Afecta_user(Afecta="SueldoReal", Descripcion="Eres empleado", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=newTurno.Sueldo, Duracion=99999999)
+    user_afecta.save()

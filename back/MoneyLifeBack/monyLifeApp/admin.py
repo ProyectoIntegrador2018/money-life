@@ -18,7 +18,7 @@ class AfectaAdmin(admin.ModelAdmin):
     search_fields=("TipoAfect",)
 
 class EventoAdmin(admin.ModelAdmin):
-    list_display=("Descripcion", "TipoEvento",)
+    list_display=("Descripcion", "Frecuencia", "TipoEvento",)
     search_fields=("Descripcion",)
     list_filter=("TipoEvento",)
     exclude = ('User',)
