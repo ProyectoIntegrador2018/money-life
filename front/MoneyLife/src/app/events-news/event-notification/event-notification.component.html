@@ -1,4 +1,5 @@
 <div class="alert" [ngClass]="{'simple': type === 'simple', 'success': type === 'success','danger': type === 'danger','warning': type === 'warning'}">
-    <h3>{{msg}}</h3>
+    <h3 (click)="openModal()">{{event.Descripcion}}</h3>
+    <!-- todo: add affects -->
     <a class="close" (click)="erase()">&times;</a>
 </div>

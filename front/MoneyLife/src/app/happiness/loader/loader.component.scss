@@ -13,7 +13,7 @@
 
 .progress__value {
   // stroke: #4caf50;
-  transition: all;
+  transition: all 2s;
 }
 
 .minifigure {
@@ -45,6 +45,9 @@
 
 .head {
   transform: translate(-50%, -8em);
+}
+.head:hover {
+  cursor: pointer;
 }
 
 /* Faces */

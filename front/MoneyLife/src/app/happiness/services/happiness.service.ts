@@ -4,30 +4,24 @@ import { AuthService } from '../../auth/auth.service';
 import { BaseService } from '../../shared/services/base.service';
 import { User } from '../../components/interfaces/user';
 
+
 @Injectable({
   providedIn: 'root'
 })
-export class QuestionsService {
+export class HappinessService {
 
   constructor(
     private base: BaseService,
     private authService: AuthService) { }
-
-  initTurnQuestions(): Observable<any> {
+  
+  getUser(): any {
     const user = this.authService.getUser() as User;
-    const body = {
+    return {
       UserID: user.id
     }
-    return this.base.post(`pregunta/getPreguntas/`, body);
   }
-
-  questionSelected(questionID: number): any {
-    const user = this.authService.getUser() as User;
-    const body = {
-      UserID: user.id,
-      PreguntaID: questionID
-    }
-    return this.base.put(`pregunta/afectaPreguntas/`, body);
+  getHappiness(): Observable<any> {
+    return this.base.post(`turno/felicidad/`, this.getUser())
   }
-
 }
+  

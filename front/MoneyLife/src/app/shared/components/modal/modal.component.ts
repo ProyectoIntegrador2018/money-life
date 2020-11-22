@@ -26,7 +26,6 @@ export class ModalComponent implements OnInit, OnChanges {
   ngOnInit(): void {
   }
   ngOnChanges(): void {
-    console.log('data modal', this.data);
     if (this.titles) {
       const aux = this.titles.filter(t => t.active);
       this.lastActive = aux[0].position;

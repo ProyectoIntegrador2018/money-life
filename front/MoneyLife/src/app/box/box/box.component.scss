@@ -2,10 +2,12 @@ $height: 100px;
 
 /* Space out content a bit */
 .container {
+  top: 40px;
   margin: auto;
-  height: 100%;
   display: flex;
   perspective: 500;
+  position: relative;
+  height: max-content;
   perspective-origin: 50% -150px;
 }
 .box {
@@ -14,6 +16,14 @@ $height: 100px;
   margin: auto;
   position:relative;
   transform-style:preserve-3d;
+  h1 {
+    text-align: center;
+  }
+  .pos {
+    top: 110px;
+    left: -30px;
+    position: absolute;
+  }
 }
 .box:hover {
   cursor: pointer;
@@ -26,7 +36,6 @@ $height: 100px;
   width: 100px;
   height: 100px;
   position: absolute;
-  // border: 1px solid #000;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

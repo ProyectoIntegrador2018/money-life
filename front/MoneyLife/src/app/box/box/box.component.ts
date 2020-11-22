@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Button } from 'src/app/shared/interfaces/button';
 
 @Component({
   selector: 'app-box',
@@ -8,7 +9,10 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 export class BoxComponent implements OnInit {
   @Output() act: EventEmitter<boolean> = new EventEmitter<boolean>();
   active = false;
-
+  newTurn: Button = {
+    name: 'Nuevo turno',
+    innerName: ''
+  };
   constructor() { }
 
   ngOnInit(): void {
