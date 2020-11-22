@@ -216,9 +216,13 @@ export class HomeComponent implements OnInit {
   questionSelected(questionID: number): void {
     this.questionsService.questionSelected(questionID).subscribe(
       resp => {
-        // console.log(resp);
-        this.turn = resp[0] as Turn;
-        this.refreshTurn();
+        if (resp.mensaje) {
+          window.alert(resp.mensaje);
+        } else {
+          this.turn = resp[0] as Turn;
+          this.refreshTurn();
+          this.activeCards = false;
+        }
       }, error => {
         //TODO: alert
       }
@@ -412,18 +416,19 @@ export class HomeComponent implements OnInit {
         break;
       case 'endGame':
         this.dataTitle = this.endTurn;
+        break;
       case 'microEvent':
         this.dataModal = [this.eventMicro];
         this.dataTitle = this.microEvent;
+        break;
     }
-    this.openModal = true;
+    this.openModal = true; //Checar 
   }
   modalActions(response: ModalResponse): void {
     // console.log(response);
     switch(response.innerName) {
       case 'questions': 
         this.questionSelected(response.data[0].Pregunta_id);
-        this.activeCards = false;
         break;
       case 'newActions':
         this.selectedAction(response.data.id, response.qty);

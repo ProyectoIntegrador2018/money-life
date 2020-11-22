@@ -29,8 +29,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False)
     def login(self, request):
-        print("Entro =",request.data)
-        print("ENTRO A GET LOGIN")
         userData = request.data
         user = authenticate(username=userData['username'], password=userData['password'])
         if user == None:
@@ -48,8 +46,6 @@ class EventoViewSet(viewsets.ModelViewSet):
     #Se llama al inicio del turno
     @action(methods=['get', 'post'], detail=False)
     def inicioTurno(self, request):
-        print("ENTROOOOO EVENTO INICIOOOO TURNOOOO")
-        print("ME LLEGO = ",request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first() 
         turno = Turnos.objects.filter(User=user).first()
@@ -62,7 +58,6 @@ class EventoViewSet(viewsets.ModelViewSet):
         afectaEventos = Afecta_user.objects.filter(id__in=afectaList)
         scripts.afectaTurnoinstantaneo(afectaEventos, turno)
 
-        print("TE ENVIE",response)
         return JsonResponse(response, safe = False)
 
 ###################################################################
@@ -74,8 +69,6 @@ class PreguntaViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False)
     def getPreguntas(self, request):
-        print("ENTROOOOO PREGUNTA INICIOOOO TURNOOOO")
-        print("ME LLEGO = ",request.data)
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first()
 
@@ -83,13 +76,10 @@ class PreguntaViewSet(viewsets.ModelViewSet):
         output = json.dumps(preguntas)
         response = json.loads(output)
         scripts.getAfectaPregunta(response)
-        print("TE ENVIE",response)
         return JsonResponse(response, safe = False)
 
     @action(methods=['put'], detail=False)
     def afectaPreguntas(self, request):
-        print("ENTROOOOO PREGUNTA AFECTA INICIOOOO TURNOOOO")
-        print("ME LLEGO PREGUNTA AFECTA = ",request.data)
         jsonPregunta = request.data
         
         user = User.objects.filter(id = jsonPregunta['UserID']).first()
@@ -102,7 +92,6 @@ class PreguntaViewSet(viewsets.ModelViewSet):
             afectasPregunta = Afecta_user.objects.filter(id__in=afectaList)
             scripts.afectaTurnoinstantaneo(afectasPregunta, turno)
         else:
-            print("TE ENVIE ",{"mensaje":"No cuentas con los requisitos necesarios para esta accion"})
             return JsonResponse({"mensaje":"No cuentas con los requisitos necesarios para esta accion"}, safe=False)
 
         if turno.Felicidad >= Decimal(100):
@@ -110,7 +99,6 @@ class PreguntaViewSet(viewsets.ModelViewSet):
 
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
-        print("TE ENVIE",serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
 
@@ -126,10 +114,7 @@ class TurnosViewSet(viewsets.ModelViewSet):
 
     #Este servicio se manda cada que inicie el turno
     @action(methods=['get', 'post'], detail=False)  #se necesita el usuario
-    def inicio(self, request):
-        print("ENTROOOOO INICIOOOO TURNOOOO")
-        print("ME LLEGO = ",request.data)
-        
+    def inicio(self, request):        
         jsonTurno = request.data
         user = User.objects.filter(id = jsonTurno["UserID"]).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -148,17 +133,16 @@ class TurnosViewSet(viewsets.ModelViewSet):
         turno.NumeroTurnos = turno.NumeroTurnos + 1
         if turno.Felicidad >= Decimal(100):
             turno.Felicidad = Decimal(99.9)
+        if turno.Felicidad <= Decimal(1):
+            turno.Felicidad = Decimal(1)
         turno.save()
 
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
-        print("TE ENVIE",serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
     @action(methods=['get', 'post'], detail=False)  #se necesita el usuario
     def intermedio(self, request):
-        print("ENTROOOOO TURNOOOO INTERMEDIO")
-        print("ME LLEGO = ",request.data)
         jsonTurno = request.data
         user = User.objects.filter(id = jsonTurno["UserID"]).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -167,17 +151,16 @@ class TurnosViewSet(viewsets.ModelViewSet):
 
         if turno.Felicidad >= Decimal(100):
             turno.Felicidad = Decimal(99.9)
+        if turno.Felicidad <= Decimal(1):
+            turno.Felicidad = Decimal(1)
+        turno.save()
 
         queryset = Turnos.objects.filter(User=user)
         serializer = TurnosSerializer(queryset, many=True)
-        print("TE ENVIE",serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
     @action(methods=['get', 'post'], detail=False)  #se necesita el usuario
     def felicidad(self, request):
-        print("ENTROOOOO TURNOOOO INTERMEDIO")
-        print("ME LLEGO = ",request.data)
-
         jsonFelicidad = request.data
         user = User.objects.filter(id = jsonFelicidad["UserID"]).first()
 
@@ -207,17 +190,12 @@ class PrestamoViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False)
     def catalogo(self, request):
-        print("ENTROOOOO CATALOGO PRESTAMOS")
-        print("ME LLEGO = ",request.data)
         queryset = TipoPrestamo.objects.all()
         serializer = PrestamosSerializer(queryset, many=True)
-        print("TE ENVIE",serializer.data)
         return JsonResponse(serializer.data, safe=False)
 
     @action(methods=['put'], detail=False)
     def Realizar(self, request):
-        print("ENTROOOOO RALIZAR PRESTAMO")
-        print("ME LLEGO = ",request.data)
         jsonPrestamo = request.data
 
         minimoAprobatorio = jsonPrestamo["ValorTotal"] * .10
@@ -239,26 +217,20 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         anos = int(anos[0])
         pagoMensual = cantidadPrestada/((1 - (pow((1 + (interes/12)), (-(anos*12)))))/(interes/12))
         interesMensual = cantidadPrestada*(interes/12)
-        print(pagoMensual)
-        print(interesMensual)
 
         if turno.Ingresos < pagoMensual:
-            print("TE ENVIE",{"mensaje": "No cuentas con los ingresos necesarios para realizar este pedido"})
             return JsonResponse({"mensaje": "No cuentas con los ingresos necesarios para realizar este pedido"}, safe=False)
 
         prestamoUser = Prestamo(User=user, idPrestamo=tipoPrestamo, ValorTotal=jsonPrestamo["ValorTotal"], CantidadPrestada=cantidadPrestada, Enganche=jsonPrestamo["Enganche"], Frecuencia=4, Amortizacion=0, Interes=interesMensual, Mensualidad=pagoMensual, AbonoCapital=0, SaldoAbsoluto=cantidadPrestada )
         prestamoUser.save()
 
-        #turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidadPrestada)
+        turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidadPrestada)
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonPrestamo["Enganche"])
         turno.save()
-        print("TE ENVIE",{"mensaje":"Se a realizado el prestamo de forma exitosa"})
         return JsonResponse({"mensaje":"Se a realizado el prestamo de forma exitosa"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def Amortizacion(self, request):
-        print("ENTROOOOO AMORTIZACION")
-        print("ME LLEGO = ",request.data)
         jsonPrestamo = request.data
 
         user = User.objects.filter(id = jsonPrestamo["UserID"]).first()
@@ -266,17 +238,14 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
         
         if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
-            print("TE ENVIE",{"mensaje": "El saldo absoluto es menos que la amortización"})
             return JsonResponse({"mensaje": "El saldo absoluto es menos que la amortización"}, safe=False)
         
         #print("Dinero de turno = ", turno.DineroEfectivo)
 
         if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
-            print("TE ENVIE",{"mensaje": "No tienes la cantidad requerida para esta accion"})
             return JsonResponse({"mensaje": "No tienes la cantidad requerida para esta accion"}, safe=False)
 
         if jsonPrestamo["Amortizacion"] <= 0:
-            print("TE ENVIE",{"mensaje": "Cantidad no valida"})
             return JsonResponse({"mensaje": "Cantidad no valida"}, safe=False)
 
         prestamo.AbonoCapital = jsonPrestamo["Amortizacion"] + prestamo.AbonoCapital
@@ -293,13 +262,10 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonPrestamo["Amortizacion"])
         turno.save()
-        print("TE ENVIE",{"mensaje":"Se realizo la amoritizacion de forma correcta"},)
         return JsonResponse({"mensaje":"Se realizo la amoritizacion de forma correcta"}, safe=False)
     
     @action(methods=['get', 'post'], detail=False)
     def prestamosActuales(self, request):
-        print("ENTROOOOO PRESTAMOS ACTUALES")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Prestamo.objects.filter(User=user)
@@ -311,7 +277,6 @@ class PrestamoViewSet(viewsets.ModelViewSet):
             mesesRestantes = math.ceil(prestamo.SaldoAbsoluto/prestamo.Mensualidad)
             prestamosActuales.append({'PrestamoID':prestamo.id, 'TipoPrestamo':tipoPrestamo.TipoPrestamo, 'Mensualidad':prestamo.Mensualidad, "SaldoAbsoluto":prestamo.SaldoAbsoluto, "MesesRestantes":mesesRestantes})
         
-        print("TE ENVIE ",prestamosActuales)
         return JsonResponse(prestamosActuales, safe=False)
 
 
@@ -324,8 +289,6 @@ class InversionViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False)
     def catalogoDisponibles(self, request):
-        print("ENTROOOOO CATALOGO DISPONIBLES")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Inversion.objects.filter(User=user)
@@ -334,28 +297,26 @@ class InversionViewSet(viewsets.ModelViewSet):
         for inversionActual in actuales:
             catalogo = catalogo.exclude(id=inversionActual.TipoInversion.id)
 
-        queryset = catalogo
-        serializer = TipoInversionesSerializer(queryset, many=True)
-        print("TE ENVIE ",serializer.data)
-        return JsonResponse(serializer.data, safe=False)
+        catalogoActual = []
+
+        for empresa in catalogo:
+            riesgo = scripts.riesgoInversion(empresa.RangoRendimiento)
+            catalogoActual.append({"id": empresa.id, "Inversion": empresa.Inversion, "TipoInversion": empresa.TipoInversion, "RangoRendimiento": riesgo})
+
+        return JsonResponse(catalogoActual, safe=False)
 
     @action(methods=['get', 'post'], detail=False)
     def inversionesActuales(self, request):
-        print("ENTROOOOO INVERSIONES ACTUALES")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         actuales = Inversion.objects.filter(User=user)
 
         queryset = actuales
         serializer = InversionesSerializer(queryset, many=True)
-        print("TE NEVIE = ",serializer.data)
         return JsonResponse(serializer.data, safe=False)
     
     @action(methods=['get', 'post'], detail=False)
     def inversionesPersonalesActuales(self, request):
-        print("ENTROOOOO INVERSIONES PERSONALES")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
 
@@ -371,21 +332,20 @@ class InversionViewSet(viewsets.ModelViewSet):
         for inverPregunta in inversionPregunta:
             inversiones.append({'id':inverPregunta.id, 'TipoInversion':'GananciaCapital', 'Inicio':inverPregunta.SaldoInicial, 'Actual':inverPregunta.SaldoActual})
 
-        print("TE ENVIE = ",inversiones)
         return JsonResponse(inversiones, safe=False)
     
     @action(methods=['post'], detail=False)
     def nueva(self, request):
-        print("ENTROOOOO NUEVA INVERSION")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
         compania = TipoInversiones.objects.filter(id=jsonInversion["InversionID"]).first()
 
         if turno.DineroEfectivo < Decimal(jsonInversion['Cantidad']):
-            print("TE ENVIE = ",{"mensaje": "No cuentas con el dinero para realizar esta accion"})
             return JsonResponse({"mensaje": "No cuentas con el dinero para realizar esta accion"}, safe=False)
+        
+        if Decimal(jsonInversion['Cantidad']) < 100:
+            return JsonResponse({"mensaje": "Valor no valido para realizar esta accion"}, safe=False)
 
         rangoRendimiento = (compania.RangoRendimiento).split(" ")
         limite_inferior = float(rangoRendimiento[0])
@@ -397,13 +357,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonInversion['Cantidad'])
         turno.save()
 
-        print("TE ENVIE = ",{"mensaje":"Se realizo la nueva inversion de forma exitosa"})
         return JsonResponse({"mensaje":"Se realizo la nueva inversion de forma exitosa"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def agregarDinero(self, request):
-        print("ENTROOOOO AGREGAR DINERO")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -411,38 +368,31 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
         
         if jsonInversion["Cantidad"] > turno.DineroEfectivo:
-            print("TE ENVIE = ",{"mensaje":"No cuentas con la cantidad de dinero para realizar esta accion"})
             return JsonResponse({"mensaje":"No cuentas con la cantidad de dinero para realizar esta accion"}, safe=False)
 
         if jsonInversion["Cantidad"] <= 0:
-            print("TE ENVIE = ",{"mensaje":"Cantidad no valida"})
             return JsonResponse({"mensaje":"Cantidad no valida"}, safe=False)
 
         inversion.SaldoAportacion = inversion.SaldoAportacion + jsonInversion["Cantidad"]
         inversion.SaldoActual = inversion.SaldoActual + jsonInversion["Cantidad"]
         inversion.save()
 
-        turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonInversion["InversionID"])
+        turno.DineroEfectivo = turno.DineroEfectivo - Decimal(jsonInversion["Cantidad"])
         turno.save()
         
-        print("TE ENVIE = ",{"mensaje": "Se realizo la transaccion de forma correcta"})
         return JsonResponse({"mensaje": "Se realizo la transaccion de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarDinero(self, request):
-        print("ENTROOOOO RETIRAR DINERO")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
         inversion = Inversion.objects.filter(id=jsonInversion["InversionID"]).first()
 
         if jsonInversion["Cantidad"] >= inversion.SaldoActual:
-            print("TE ENVIE = ",{"mensaje":"No cuentas con suficiente dinero para retirar esta cantidad"})
             return JsonResponse({"mensaje":"No cuentas con suficiente dinero para retirar esta cantidad"}, safe=False)
 
         if jsonInversion["Cantidad"] <= 0:
-            print("TE ENVIE = ",{"mensaje":"Cantidad no valida"})
             return JsonResponse({"mensaje":"Cantidad no valida"}, safe=False)
 
         inversion.Aportacion = inversion.Aportacion + jsonInversion["Cantidad"]
@@ -452,13 +402,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(jsonInversion["Cantidad"])
         turno.save()
         
-        print("TE ENVIE = ",{"mensaje": "La transaccion se realizo de forma correcta"})
         return JsonResponse({"mensaje": "La transaccion se realizo de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarAccion(self, request):
-        print("ENTROOOOO RETIRAR ACCION")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -468,13 +415,10 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        print("TE ENVIE = ",{"mensaje": "Se retiro la accion de forma correcta"})
         return JsonResponse({"mensaje": "Se retiro la accion de forma correcta"}, safe=False)
 
     @action(methods=['put'], detail=False)
     def retirarInversionPersonal(self, request):
-        print("ENTROOOOO RETIRAR INVERSION PERSONAL")
-        print("ME LLEGO = ",request.data)
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -484,7 +428,6 @@ class InversionViewSet(viewsets.ModelViewSet):
         inversion.delete()
         turno.save()
         
-        print("TE ENVIE = ",{"mensaje": "Se retiro la accion de forma correcta"})
         return JsonResponse({"mensaje": "Se retiro la accion de forma correcta"}, safe=False)
 
 ###################################################################
@@ -494,8 +437,6 @@ class PortafolioViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get', 'post'], detail=False)
     def financiero(self, request):
-        print("ENTROOOOO PORTAFOLIO FINANCIERO")
-        print("ME LLEGO = ",request.data)
         jsonPortafolio = request.data
         user = User.objects.filter(id = jsonPortafolio['UserID']).first()
         turno = Turnos.objects.filter(User=user).first()
@@ -535,7 +476,6 @@ class PortafolioViewSet(viewsets.ModelViewSet):
             tipoInversion = TipoPregunta.objects.filter(id=inversionPreg.TipoInversion.id).first()
             portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":tipoInversion.TipoPregunta, "Cantidad":inversionPreg.SaldoActual, "Periodo":"Activo"})
         
-        print("TE ENVIE = ",portafolio)
         return JsonResponse(portafolio, safe=False)
 
     
@@ -546,17 +486,13 @@ class FinJuegoViewSet(viewsets.ModelViewSet):
 
     @action(methods=['put'], detail=False)
     def juego(self, request):
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print("ENTROOOOO FIN DEL JUEGO")
-        print("ME LLEGO = ",request.data)
+        print("ESTAN LLAMANDO A FIN DEL JUEGO")
         jsonUser = request.data
         user = User.objects.filter(id = jsonUser['UserID']).first()
 
         scripts.borrarInfoUser(user)
         scripts.reiniciarUser(user)
 
-        print("TE ENVIE = ",{})
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         return JsonResponse({"mensaje":"Fin del juego"}, safe=False)
 
 

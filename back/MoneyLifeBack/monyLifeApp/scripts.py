@@ -35,7 +35,6 @@ def eventoAfecta(user, eventos):
     return afectaList
 
 def getAfectaEvento(response):
-    print(response[0])
 
     for i in response:
         if i != {}:
@@ -241,8 +240,6 @@ def preguntaAfecta(user, pregunta):
                 afecta_usuario.save()
                 afectaList.append(afecta_usuario.id)
         else:
-            print("Afecta = ", afecta.Afecta)
-            print("Duracion = ", afecta.Periodo.Turnos)
             if str(afecta.Afecta) == 'DineroEfectivo' and afecta.Periodo.Turnos != -1:
                 rangoRendimiento = (tipoInversion.TasaRendimiento).split(" ")
                 limite_inferior = float(rangoRendimiento[0])
@@ -256,7 +253,6 @@ def preguntaAfecta(user, pregunta):
                 afecta_usuario = Afecta_user(User=user, Descripcion=pregunta.Descripcion, Afecta=afecta.Afecta, TurnosEsperar=duracion.Turnos, TurnosRestante=duracion.Turnos, Cantidad=afecta.Cantidad, Duracion=afecta.Duracion)
                 afecta_usuario.save()
                 afectaList.append(afecta_usuario.id)
-    print("////////////////////////////////////////////")
     return afectaList
 
 def validarPregunta(user, pregunta):
@@ -280,21 +276,20 @@ def validarPregunta(user, pregunta):
     return True
             
 def getAfectaPregunta(response):
-    print(response[0])
-
     for i in response:
         if i != {}:
             i['Afecta'] = []
             pregunta = Preguntas.objects.filter(id = i["Pregunta_id"]).first()
             afectas = Preguntas_Afecta.objects.filter(Preguntas = pregunta)
             for afecta in afectas:
-                periodo = str(afecta.Periodo)
-                if afecta.Periodo.Turnos < 0:
-                    periodo = "Exclusivo"
-                duracion = afecta.Duracion
-                if afecta.Duracion > 1000:
-                    duracion = "Infinito"
-                i['Afecta'].append({"Afecta": afecta.Afecta.TipoAfect, "Cantidad": afecta.Cantidad, "Periodo":periodo, "Duracion":duracion})
+                if afecta.Periodo.Turnos != -1:
+                    periodo = str(afecta.Periodo)
+                    if afecta.Periodo.Turnos < 0:
+                        periodo = "Exclusivo"
+                    duracion = afecta.Duracion
+                    if afecta.Duracion > 1000:
+                        duracion = "Infinito"
+                    i['Afecta'].append({"Afecta": afecta.Afecta.TipoAfect, "Cantidad": afecta.Cantidad, "Periodo":periodo, "Duracion":duracion})
 
 def afectaInversion(afecta, user):
     listaInversionAfecta = ['Telecomunicaciones', 'Tecnologia', 'Construccion', 'Bienes_Raices']
@@ -346,7 +341,6 @@ def getSeleccionPregunta(queryset, tipoEvento, preguntas, turno):
             else:
                 pass
 
-    #print("SE SELECCIONARON ", len(preguntas), " PREGUNTAS ")
         
 
 def seleccionPregunta(user):
@@ -539,27 +533,33 @@ def afectaMensual(afecta):
 def prestamosTurnos(user, turno, prestamos):
 
     for prestamo in prestamos:
-        turno.DineroEfectivo = turno.DineroEfectivo - prestamo.Mensualidad
-        tipoPrestamo = prestamo.idPrestamo
+        if prestamo.Frecuencia <= 0:
+            turno.DineroEfectivo = turno.DineroEfectivo - prestamo.Mensualidad
+            tipoPrestamo = prestamo.idPrestamo
+            
+            tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = str(tipoPrestamo)).first()
+
+            prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - prestamo.Mensualidad
+
+            if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
+                prestamo.Mensualidad = prestamo.SaldoAbsoluto
+
+            interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
+            interes = float(interes)/100
+            interesMensual = prestamo.SaldoAbsoluto * Decimal(interes/12)
+
+            prestamo.Frecuencia = 4
+            prestamo.Interes = interesMensual
+            prestamo.save()
+
+            if prestamo.SaldoAbsoluto <= 0:
+                prestamo.delete()
+            turno.save()
+        else:
+            prestamo.Frecuencia = prestamo.Frecuencia - 1
+            prestamo.save()
+
         
-        tipoPrestamo = TipoPrestamo.objects.filter(idPrestamo = str(tipoPrestamo)).first()
-
-        prestamo.SaldoAbsoluto = prestamo.SaldoAbsoluto - prestamo.Mensualidad
-
-        if prestamo.SaldoAbsoluto < prestamo.Mensualidad:
-            prestamo.Mensualidad = prestamo.SaldoAbsoluto
-
-        interes = re.sub('%', '',str(tipoPrestamo.TazaInteres) )
-        interes = float(interes)/100
-        interesMensual = prestamo.SaldoAbsoluto * Decimal(interes/12)
-
-        prestamo.Interes = interesMensual
-        prestamo.save()
-
-        if prestamo.SaldoAbsoluto <= 0:
-            prestamo.delete()
-
-        turno.save()
 
 def inversionesTurnos(user, turno, inversiones):
 
@@ -599,6 +599,28 @@ def inversionesPreguntasTurnos(user, turno, inversionesPregunta):
         inversion.TazaRendimiento = tasaRendimiento
         inversion.SaldoActual = inversion.SaldoActual + (inversion.SaldoActual * Decimal(inversion.TazaRendimiento))
         inversion.save()
+
+###################################################################
+
+###################################################################
+
+def riesgoInversion(rangoRendimiento):
+    rango = rangoRendimiento.split(" ")
+    limBajo = float(rango[0])
+    limAlto = float(rango[2])
+
+    if limBajo < 0 and limAlto <= 0:
+        return "Muy Bajo"
+    elif limBajo < 0 and limAlto + limBajo <= 0 and limAlto - limBajo > 1:
+        return "Muy Bajo"
+    elif limBajo < 0 and limAlto + limBajo <= 0 and limAlto - limBajo > .5:
+        return "Bajo"
+    elif limBajo < 0:
+        return "Medio"
+    elif limAlto - limBajo < .2:
+        return "Alto"
+    return "Muy Alto"
+
 
 ###################################################################
 
