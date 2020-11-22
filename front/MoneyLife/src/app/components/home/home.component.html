@@ -8,12 +8,12 @@
 <div class="header">
   <app-loader *ngIf="turn" [value]='turn?.Felicidad' (click)="showHappiness()"></app-loader>
   <app-event-notification *ngIf="show && eventMicro" [event]="eventMicro" [type]="'simple'" (pressed)="openModalFun($event)" (close)="close($event)" ></app-event-notification>
-  <app-button [ob]="portfolioBtn" [color]="'green'" (pressed)="openModalFun($event)"></app-button>
-  <app-digits-show *ngIf="turn" [name]="'Ingresos Mensuales'" [number]="turn.Ingresos"></app-digits-show>
-  <app-digits-show *ngIf="turn" [name]="'Egresos Mensuales'" [number]="turn.Egresos"></app-digits-show>
-  <app-digits-show *ngIf="turn" [name]="'Saldo en efectivo'" [number]="turn.DineroEfectivo"></app-digits-show>
-  <h1>Turno: {{turn?.NumeroTurnos}}</h1>
-  <app-button [ob]="endTurnBtn" [color]="'red'" (pressed)="openModalFun($event)"></app-button>
+  <app-button class="pos" [ob]="portfolioBtn" [color]="'green'" (pressed)="openModalFun($event)"></app-button>
+  <app-digits-show class="pos" *ngIf="turn" [name]="'Ingresos Mensuales'" [number]="turn.Ingresos"></app-digits-show>
+  <app-digits-show class="pos" *ngIf="turn" [name]="'Egresos Mensuales'" [number]="turn.Egresos"></app-digits-show>
+  <app-digits-show class="pos" *ngIf="turn" [name]="'Saldo en efectivo'" [number]="turn.DineroEfectivo"></app-digits-show>
+  <h1 class="pos">Turno: {{turn?.NumeroTurnos}}</h1>
+  <app-button class="pos" [ob]="endTurnBtn" [color]="'red'" (pressed)="openModalFun($event)"></app-button>
 </div>
 
 <div class="content">
@@ -115,4 +115,3 @@
   </div>
 </div>
 <app-event-banner [event]="eventMacro"></app-event-banner>
-<!-- ERROR porque no tiene evento descripcion -->
