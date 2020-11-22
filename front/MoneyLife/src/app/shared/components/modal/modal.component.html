@@ -62,7 +62,7 @@
           <thead style="position: sticky;">
             <tr>
               <th>Nombre</th>
-              <th>Periodo</th>
+              <th>Período</th>
               <th>Cantidad</th>
             </tr>
           </thead>
@@ -83,7 +83,7 @@
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Periodo</th>
+              <th>Período</th>
               <th>Cantidad</th>
             </tr>
           </thead>
@@ -112,8 +112,8 @@
           <thead>
             <tr>
               <td>Nombre</td>
-              <td>Tipo de inversion</td>
-              <td>Rango de rendimiento</td>
+              <td>Tipo de inversión</td>
+              <td>Rendimiento</td>
               <td>Cantidad</td>
             </tr>
           </thead>
@@ -132,27 +132,25 @@
       </div>
     </div>
   </ng-container>
-  <div [ngClass]="{'side': selected}">
-    <div class="aa_htmlTable">
-      <table>
-        <thead>
-          <tr>
-            <td>Nombre</td>
-            <td>Tipo de inversion</td>
-            <td>Rango de rendimiento</td>
-            <td>Seleccionar</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let d of data">
-            <td>{{d?.Inversion}}</td>
-            <td>{{d?.TipoInversion}}</td>
-            <td>{{d?.RangoRendimiento}}</td>
-            <td><button (click)="selectedObj(d)">Seleccionar</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="aa_htmlTable" [ngClass]="{'adjust': selected}">
+    <table>
+      <thead>
+        <tr>
+          <td>Nombre</td>
+          <td>Tipo de inversión</td>
+          <td>Rendimiento</td>
+          <td>Seleccionar</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data">
+          <td>{{d?.Inversion}}</td>
+          <td>{{d?.TipoInversion}}</td>
+          <td>{{d?.RangoRendimiento}}</td>
+          <td><button (click)="selectedObj(d)">Seleccionar</button></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="controls">
     <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
@@ -167,9 +165,9 @@
         <table>
           <thead>
             <tr>
-              <td>Tipo prestamo</td>
-              <td>Taza interes</td>
-              <td>Duracion</td>
+              <td>Tipo préstamo</td>
+              <td>Tasa interés</td>
+              <td>Duración</td>
               <td>Cantidad</td>
               <td>Enganche</td>
               <td>Acciones</td>
@@ -195,27 +193,25 @@
       </div>
     </div>
   </ng-container>
-  <div [ngClass]="{'side': selected}">
-    <div class="aa_htmlTable">
-      <table>
-        <thead>
-          <tr>
-            <td>Tipo prestamo</td>
-            <td>Taza interes</td>
-            <td>Duracion</td>
-            <td>Seleccionar</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let d of data">
-            <td>{{d?.TipoPrestamo}}</td>
-            <td>{{d?.TazaInteres}}</td>
-            <td>{{d?.Duracion}}</td>
-            <td><button (click)="selectedObj(d)">Seleccionar</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="aa_htmlTable" [ngClass]="{'adjust': selected}">
+    <table>
+      <thead>
+        <tr>
+          <td>Tipo préstamo</td>
+          <td>Tasa interés</td>
+          <td>Duracion</td>
+          <td>Seleccionar</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data">
+          <td>{{d?.TipoPrestamo}}</td>
+          <td>{{d?.TazaInteres}}</td>
+          <td>{{d?.Duracion}}</td>
+          <td><button (click)="selectedObj(d)">Seleccionar</button></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="controls">
     <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
@@ -231,12 +227,11 @@
           <table>
             <thead>
               <tr>
-                <th>Nombre de inversion</th>
+                <th>Nombre de inversión</th>
                 <th>Tipo empresa</th>
-                <th>Aportación</th>
                 <th>Saldo inicial</th>
-                <th>Saldo actual</th>
                 <th>Saldo aportación</th>
+                <th>Saldo actual</th>
                 <th>Invertir más</th>
                 <th>Retirar una cantidad</th>
                 <th>Retirar todo</th>
@@ -246,10 +241,9 @@
               <tr>
               <td>{{objSelected?.NombreInversion}}</td>
               <td>{{objSelected?.TipoEmpresa}}</td>
-              <td>{{objSelected?.Aportacion}}</td>
               <td>{{objSelected?.SaldoInicial}}</td>
-              <td>{{objSelected?.SaldoActual}}</td>
               <td>{{objSelected?.SaldoAportacion}}</td>
+              <td>{{objSelected?.SaldoActual}}</td>
               <td>
                 <input type="number" [(ngModel)]="qty">
                 <button (click)="sendSelectedObj(activeSwitch.internalName+'invest')">Invertir</button>
@@ -267,33 +261,29 @@
         </div>
       </div>
     </ng-container>
-    <div [ngClass]="{'side': selected}">
-      <div class="aa_htmlTable">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre de inversion</th>
-              <th>Tipo empresa</th>
-              <th>Aportación</th>
-              <th>Saldo inicial</th>
-              <th>Saldo actual</th>
-              <th>Saldo aportación</th>
-              <th>Seleccionar</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let d of data[0]?.shared">
-              <td>{{d?.NombreInversion}}</td>
-              <td>{{d?.TipoEmpresa}}</td>
-              <td>{{d?.Aportacion}}</td>
-              <td>{{d?.SaldoInicial}}</td>
-              <td>{{d?.SaldoActual}}</td>
-              <td>{{d?.SaldoAportacion}}</td>
-              <td><button (click)="selectedObj(d)">Seleccionar</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="aa_htmlTable" [ngClass]="{'adjust': selected}">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre de inversión</th>
+            <th>Tipo empresa</th>
+            <th>Saldo inicial</th>
+            <th>Saldo aportación</th>
+            <th>Saldo actual</th>
+            <th>Seleccionar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of data[0]?.shared">
+            <td>{{d?.NombreInversion}}</td>
+            <td>{{d?.TipoEmpresa}}</td>
+            <td>{{d?.SaldoInicial}}</td>
+            <td>{{d?.SaldoAportacion}}</td>
+            <td>{{d?.SaldoActual}}</td>
+            <td><button (click)="selectedObj(d)">Seleccionar</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="controls">
       <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
@@ -307,7 +297,7 @@
           <table>
             <thead>
               <tr>
-                <th>Tipo de inversion</th>
+                <th>Tipo de inversión</th>
                 <th>Inicio</th>
                 <th>Actual</th>
                 <th>Retirer</th>
@@ -325,27 +315,25 @@
         </div>
       </div>
     </ng-container>
-    <div [ngClass]="{'side': selected}">
-      <div class="aa_htmlTable">
-        <table>
-          <thead>
-            <tr>
-              <th>Tipo de inversion</th>
-              <th>Inicio</th>
-              <th>Actual</th>
-              <th>Seleccionar</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let d of data[0]?.own">
-              <td>{{d?.TipoInversion}}</td>
-              <td>{{d?.Inicio}}</td>
-              <td>{{d?.Actual}}</td>
-              <td><button (click)="selectedObj(d)">Seleccionar</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="aa_htmlTable" [ngClass]="{'adjust': selected}">
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo de inversion</th>
+            <th>Inicio</th>
+            <th>Actual</th>
+            <th>Seleccionar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of data[0]?.own">
+            <td>{{d?.TipoInversion}}</td>
+            <td>{{d?.Inicio}}</td>
+            <td>{{d?.Actual}}</td>
+            <td><button (click)="selectedObj(d)">Seleccionar</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="controls">
       <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
@@ -384,29 +372,27 @@
       </div>
     </div>
   </ng-container>
-  <div [ngClass]="{'side': selected}">
-    <div class="aa_htmlTable">
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo de inversion</th>
-            <th>Mensualidad</th>
-            <th>Meses restantes</th>
-            <th>Saldo absoluto</th>
-            <th>Seleccionar</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let d of data">
-            <td>{{d?.TipoPrestamo}}</td>
-            <td>{{d?.Mensualidad}}</td>
-            <td>{{d?.MesesRestantes}}</td>
-            <td>{{d?.SaldoAbsoluto}}</td>
-            <td><button (click)="selectedObj(d)">Seleccionar</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="aa_htmlTable" [ngClass]="{'adjust': selected}">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo de inversion</th>
+          <th>Mensualidad</th>
+          <th>Meses restantes</th>
+          <th>Saldo absoluto</th>
+          <th>Seleccionar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data">
+          <td>{{d?.TipoPrestamo}}</td>
+          <td>{{d?.Mensualidad}}</td>
+          <td>{{d?.MesesRestantes}}</td>
+          <td>{{d?.SaldoAbsoluto}}</td>
+          <td><button (click)="selectedObj(d)">Seleccionar</button></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="controls">
     <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
@@ -444,8 +430,8 @@
 </ng-template>
 <ng-template #endGame>
   <div class="text">
-    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Save')">Reiniciar juego</p>
-    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Erase')">Guardar y salir</p>
+    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Erase')">Reiniciar juego</p>
+    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Save')">Guardar y salir</p>
     <p id="endGame" (click)="cancelModalFunc()">Cancelar</p>
   </div>
 </ng-template>
