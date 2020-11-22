@@ -35,27 +35,27 @@ export class LoaderComponent implements OnInit {
   }
   identifyHappiness(): string {
     if (this.value >= 0 && this.value <= 15) { // Cara preocupada
-      this.colorProgress = '#E84A5F';
+      this.colorProgress = '#F51432';
       return '500';
     }
     if (this.value > 15 && this.value <= 30) { // Muy triste
-      this.colorProgress = '#138086';
+      this.colorProgress = '#E9B80F';
       return '400';
     }
     if (this.value > 30 && this.value <= 45) { // Triste
-      this.colorProgress = '#E84A5F';
+      this.colorProgress = '#48E1E5';
       return '300';
     }
-    if (this.value > 45 && this.value <= 65) { // 
-      this.colorProgress = '#1CA7EC';
+    if (this.value > 45 && this.value <= 65) { // Normal
+      this.colorProgress = '#25C462';
       return '0';
     }
     if (this.value > 65 && this.value <= 82) { // Feliz
-      this.colorProgress = '#56C596';
+      this.colorProgress = '#04D017';
       return '100';
     }
     if (this.value > 82 && this.value <= 100) { // Muy feliz
-      this.colorProgress = '#43978D';
+      this.colorProgress = '#2CDA01';
       return '200';
     }
   }

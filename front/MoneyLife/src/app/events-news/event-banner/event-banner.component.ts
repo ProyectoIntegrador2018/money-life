@@ -6,13 +6,10 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./event-banner.component.scss']
 })
 export class EventBannerComponent implements OnInit {
-  @Input() msg: any;
+  @Input() event: any;
 
   constructor() { }
 
   ngOnInit(): void {
-    if (!this.msg) {
-      this.msg = "No hay noticias";
-    }
   }
 }

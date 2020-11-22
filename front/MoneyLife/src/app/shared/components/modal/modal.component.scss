@@ -196,6 +196,9 @@
           .text {
             z-index: 1;
             position: inherit;
+            #endGame:hover {
+              cursor: pointer;
+            }
             p {
               position: relative;
               display: block;
@@ -241,8 +244,8 @@
           .aa_htmlTable{
             z-index: 1;
             width: 100%;
-            height: 100%;
             margin: auto;
+            max-height: 500px;
             position: relative;
             overflow-y: scroll; 
           }

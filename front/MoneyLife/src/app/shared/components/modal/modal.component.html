@@ -33,7 +33,16 @@
                               <ng-container *ngSwitchCase="'questions'">
                                 <ng-container *ngTemplateOutlet="questions"></ng-container>
                               </ng-container>
-                            </ng-container>
+                              <ng-container *ngSwitchCase="'endGame'">
+                                <ng-container *ngTemplateOutlet="endGame"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'happiness'">
+                                <ng-container *ngTemplateOutlet="happiness"></ng-container>
+                              </ng-container>
+                              <ng-container *ngSwitchCase="'microEvent'">
+                                <ng-container *ngTemplateOutlet="microEvent"></ng-container>
+                              </ng-container>
+                          </ng-container>
                           </div>
                     
                         </div>
@@ -58,7 +67,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of data.Ingresos">
+            <tr *ngFor="let d of data?.Ingresos">
               <td>{{d?.Nombre}}</td>
               <td>{{d?.Periodo}}</td>
               <td>{{d?.Cantidad}}</td>
@@ -79,7 +88,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of data.Egresos">
+            <tr *ngFor="let d of data?.Egresos">
               <td>{{d?.Nombre}}</td>
               <td>{{d?.Periodo}}</td>
               <td>{{d?.Cantidad}}</td>
@@ -408,9 +417,89 @@
   <div class="text">
     <p>{{data[0]?.Descripcion}}</p>
   </div>
+  <div class="aa_htmlTable">
+    <table>
+      <thead>
+        <tr>
+          <th>Afeta</th>
+          <th>Cantidad</th>
+          <th>Periodo</th>
+          <th>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data[0].Afecta">
+          <td>{{d?.Afecta}}</td>
+          <td>{{d?.Cantidad}}</td>
+          <td>{{d?.Periodo}}</td>
+          <td>{{d?.Duracion}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="controls">
     <p id="accept" (click)="cancelModalFunc()">Cancelar</p>
     <p id="accept" (click)="closeModal()">Aceptar</p>
   </div>
 </ng-template>
+<ng-template #endGame>
+  <div class="text">
+    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Save')">Reiniciar juego</p>
+    <p id="endGame" (click)="sendSelectedObj(activeSwitch.internalName+'Erase')">Guardar y salir</p>
+    <p id="endGame" (click)="cancelModalFunc()">Cancelar</p>
+  </div>
+</ng-template>
+<ng-template #happiness>
+  <div class="aa_htmlTable">
+    <table>
+      <thead>
+        <tr>
+          <th>Descripcion</th>
+          <th>Cantidad</th>
+          <th>Periodo</th>
+          <th>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data">
+          <td>{{d?.Decripcion}}</td>
+          <td>{{d?.Cantidad}}</td>
+          <td>{{d?.Periodo}}</td>
+          <td>{{d?.Duracion}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="controls">
+    <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
+  </div>
+</ng-template>
 
+<ng-template #microEvent>
+  <div class="text">
+    <h2>{{data[0].Descripcion}}</h2>
+  </div>
+  <div class="aa_htmlTable">
+    <table>
+      <thead>
+        <tr>
+          <th>Afecta</th>
+          <th>Cantidad</th>
+          <th>Periodo</th>
+          <th>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of data[0].Afecta">
+          <td>{{d?.Afecta}}</td>
+          <td>{{d?.Cantidad}}</td>
+          <td>{{d?.Periodo}}</td>
+          <td>{{d?.Duracion}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="controls">
+    <p id="accept" (click)="cancelModalFunc()">Cerrar</p>
+  </div>
+</ng-template>

@@ -6,6 +6,9 @@
   border-radius:5px;
   box-shadow:0 0 15px 5px #ccc;
 }
+h3:hover {
+  cursor: pointer;
+}
 .close{
   position:absolute;
   width:30px;
@@ -15,7 +18,7 @@
   border-style:solid;
   border-radius:50%;
   right:15px;
-  top:25px;
+  top:32%;
   text-align:center;
   font-size:1.6em;
   cursor:pointer;

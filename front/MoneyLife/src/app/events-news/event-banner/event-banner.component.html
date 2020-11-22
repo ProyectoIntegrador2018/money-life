@@ -48,23 +48,54 @@
        </div>
     </div>
     <div class="ticker-title">
-      <span>Noticias de última hora</span>
-      <span>Noticias de última hora</span>
-      <span>Noticias de última hora</span>
-      <span>Noticias de última hora</span>
-      <span>Noticias de última hora</span>
-      <span>Noticias de última hora</span>
+      <ng-container *ngIf="event">
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+      </ng-container>
+      <ng-container *ngIf="!event">
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>        
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>        
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>        
+        <span>Nada nuevo</span>
+        <span>Nada nuevo</span>
+      </ng-container>
     </div>
     <div class="ticker-news">
-      <span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}}, </span>
-        <span>{{msg}} </span>
+      <span *ngIf="event">
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}}, </span>
+        <span>{{event?.Descripcion}} </span>
+      </span>
+      <span *ngIf="!event">
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia, </span>
+        <span>No hay noticia </span>
       </span>
     </div>
   </div>
