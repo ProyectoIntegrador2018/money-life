@@ -62,7 +62,11 @@ export class LoginComponent implements OnInit {
 
       this.loginService.login(this.logInForm.value).subscribe(
         resp => {
-          this.setUser(resp as User);
+          if(resp.mensaje) {
+            window.alert(resp.mensaje);
+          } else {
+            this.setUser(resp as User);
+          }
         }, error => {
           //TODO: Alert error
         }
@@ -83,7 +87,8 @@ export class LoginComponent implements OnInit {
           resp => {
             this.setUser(resp as User);
           }, error => {
-            // TODO Alert error
+            window.alert('El usuario ya existe');
+            console.log('error', error);
           }
         );
       } else {
