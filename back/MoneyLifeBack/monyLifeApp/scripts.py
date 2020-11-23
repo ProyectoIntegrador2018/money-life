@@ -465,6 +465,16 @@ def modifyTurno(turno, afecta, cantidad, porcentaje, suma):
             turno.DineroEfectivo = turno.DineroEfectivo - (turno.DineroEfectivo * Decimal(float(cantidad)/100))
             return True
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
+    ######################
+    elif afecta == 'EgresoPersonal':
+        if porcentaje:
+            if suma:
+                turno.DineroEfectivo = turno.DineroEfectivo + (turno.DineroEfectivo * Decimal(float(cantidad)/100))
+                return True
+            turno.DineroEfectivo = turno.DineroEfectivo - (turno.DineroEfectivo * Decimal(float(cantidad)/100))
+            return True
+        turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
+    #####################
     elif 'Inversion' in str(afecta):
         turno.DineroEfectivo = turno.DineroEfectivo + Decimal(cantidad)
     elif afecta == 'Ingresos':
@@ -482,7 +492,7 @@ def turnoIngresosEgresos(user, turno):
     inversionPregunta = InversionPregunta.objects.filter(User = user)
     sueldoActual = Afecta_user.objects.filter(User=user, Afecta='SueldoReal').first()
   
-    turnoEgresos = Decimal(0)
+    turnoEgresos = Decimal(8000)
     turnoIngresos = Decimal(sueldoActual.Cantidad)
 
     for prestamo in prestamos:

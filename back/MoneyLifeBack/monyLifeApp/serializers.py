@@ -35,6 +35,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         user_afecta = Afecta_user(Afecta="SueldoReal", Descripcion="Eres empleado", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=newTurno.Sueldo, Duracion=99999999)
         user_afecta.save()
 
+        egreso_afecta = Afecta_user(Afecta="EgresoPersonal", Descripcion="Tienes hambre", User=user, TurnosEsperar=4, TurnosRestante=4, Cantidad=8000, Duracion=99999999)
+        egreso_afecta.save()
         return user
 
 class EventoSerializer(serializers.ModelSerializer):
