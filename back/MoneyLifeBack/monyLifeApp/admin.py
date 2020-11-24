@@ -104,7 +104,7 @@ admin.site.register(TipoInversiones, TipoInversionesAdmin)
 
 admin.site.register(TipoPrestamo, TipoPrestamoAdmin)
 
-admin.site.register(TipoPrestamo_Afect, TipoPrestamo_AfectAdmin)
+#admin.site.register(TipoPrestamo_Afect, TipoPrestamo_AfectAdmin)
 
 admin.site.register(Archivos, ArchivosAdmin)
 

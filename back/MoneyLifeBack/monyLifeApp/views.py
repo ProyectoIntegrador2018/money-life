@@ -243,15 +243,15 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         turno = Turnos.objects.filter(User=user).first()
         prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
         
-        if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
+        if prestamo.SaldoAbsoluto < Decimal(jsonPrestamo["Amortizacion"]):
             return JsonResponse({"mensaje": "El saldo absoluto es menos que la amortización"}, safe=False)
         
         #print("Dinero de turno = ", turno.DineroEfectivo)
 
-        if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
+        if turno.DineroEfectivo <= Decimal(jsonPrestamo["Amortizacion"]):
             return JsonResponse({"mensaje": "No tienes la cantidad requerida para esta acción"}, safe=False)
 
-        if jsonPrestamo["Amortizacion"] <= 0:
+        if Decimal(jsonPrestamo["Amortizacion"]) <= 0:
             return JsonResponse({"mensaje": "Cantidad no valida"}, safe=False)
 
         prestamo.AbonoCapital = Decimal(jsonPrestamo["Amortizacion"]) + prestamo.AbonoCapital
@@ -345,17 +345,18 @@ class InversionViewSet(viewsets.ModelViewSet):
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
 
-        inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user.id)
+        #inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user.id)
         inversionPregunta = InversionPregunta.objects.filter(User = user.id)
 
         inversiones = []
 
+        """
         for afecta in inversionesAfecta:
             periodo = Periodo.objects.filter(Turnos=afecta.TurnosEsperar).first()
-            inversiones.append({'id':afecta.id, 'TipoInversion': 'FlujoEfectivo', 'Cantidad':afecta.Cantidad, 'Periodo': periodo.TipoPeriodo})
-
+            inversiones.append({'id':afecta.id, 'TipoInversion': 'FlujoEfectivo', 'Descripcion':afecta.Descripcion, 'Cantidad':afecta.Cantidad, 'Periodo': periodo.TipoPeriodo})
+        """
         for inverPregunta in inversionPregunta:
-            inversiones.append({'id':inverPregunta.id, 'TipoInversion':'GananciaCapital', 'Inicio':inverPregunta.SaldoInicial, 'Actual':inverPregunta.SaldoActual})
+            inversiones.append({'id':inverPregunta.id, 'TipoInversion':'GananciaCapital', 'Descripcion':inverPregunta.Descripcion, 'Inicio':inverPregunta.SaldoInicial, 'Actual':inverPregunta.SaldoActual})
 
         return JsonResponse(inversiones, safe=False)
     
