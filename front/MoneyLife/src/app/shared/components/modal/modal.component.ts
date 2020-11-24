@@ -74,8 +74,11 @@ export class ModalComponent implements OnInit, OnChanges {
     }
     this.close.emit(this.sendData);
   }
-  @HostListener('document:keyup.escape', ['$event'])
+  @HostListener('document:keyup.escape', ['$event']) // Presinar esc para cerrar modal
   onEscape() {
     this.cancelModalFunc();
   }
-}
+  isNumber(val: any): boolean {
+    return (Number(val)) ? true : false; 
+  }
+ }

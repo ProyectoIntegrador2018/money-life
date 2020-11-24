@@ -12,7 +12,7 @@
   <app-digits-show class="pos" *ngIf="turn" [name]="'Ingresos Mensuales'" [number]="turn.Ingresos"></app-digits-show>
   <app-digits-show class="pos" *ngIf="turn" [name]="'Egresos Mensuales'" [number]="turn.Egresos"></app-digits-show>
   <app-digits-show class="pos" *ngIf="turn" [name]="'Saldo en efectivo'" [number]="turn.DineroEfectivo"></app-digits-show>
-  <h1 class="pos">Turno: {{turn?.NumeroTurnos}}</h1>
+  <h1 class="pos">Semana: {{turn?.NumeroTurnos}}</h1>
   <app-button class="pos" [ob]="endTurnBtn" [color]="'red'" (pressed)="openModalFun($event)"></app-button>
 </div>
 

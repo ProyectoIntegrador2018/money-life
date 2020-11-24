@@ -48,11 +48,13 @@
        </div>
     </div>
     <div class="ticker-title">
+      <!-- Eventos enviado por modal padre -->
       <ng-container *ngIf="event">
-        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
-        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
-        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
-        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantida = {{ affect.Cantidad }} Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantidad = <span *ngIf="isNumber(affect.Cantidad)"> {{ affect.Cantidad * 100 }}% </span> <span *ngIf="!isNumber(affect.Cantidad)"> {{ affect.Cantidad}} </span> Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantidad = <span *ngIf="isNumber(affect.Cantidad)"> {{ affect.Cantidad * 100 }}% </span> <span *ngIf="!isNumber(affect.Cantidad)"> {{ affect.Cantidad}} </span> Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantidad = <span *ngIf="isNumber(affect.Cantidad)"> {{ affect.Cantidad * 100 }}% </span> <span *ngIf="!isNumber(affect.Cantidad)"> {{ affect.Cantidad}} </span> Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantidad = <span *ngIf="isNumber(affect.Cantidad)"> {{ affect.Cantidad * 100 }}% </span> <span *ngIf="!isNumber(affect.Cantidad)"> {{ affect.Cantidad}} </span> Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
+        <span *ngFor="let affect of event.Afecta">(Afecta = {{ affect.Afecta }}: Cantidad = <span *ngIf="isNumber(affect.Cantidad)"> {{ affect.Cantidad * 100 }}% </span> <span *ngIf="!isNumber(affect.Cantidad)"> {{ affect.Cantidad}} </span> Periodo =  {{ affect.Periodo }} Duración = {{ affect.Duracion }}) </span>
       </ng-container>
       <ng-container *ngIf="!event">
         <span>Nada nuevo</span>

@@ -12,4 +12,7 @@ export class EventBannerComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  isNumber(val: any): boolean {
+    return (Number(val) && val > -1 && val < 1) ? true : false; 
+  }
 }
