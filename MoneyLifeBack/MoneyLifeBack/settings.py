@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 's-yi$jhyeg&vwkbp@9z7uxup#gm%)df!-8e=nwropm2@ber8&o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS=['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -92,11 +94,11 @@ WSGI_APPLICATION = 'MoneyLifeBack.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'MoneyDB',
-        'USER': 'moneylifeuser',
-        'PASSWORD': 'moneylifeuser#',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'moneydb',
+        'USER': 'moneylifeuser@moneylifedbserver',
+        'PASSWORD': '%jmnn6@L5[)FxP-z',
+        'HOST': 'moneylifedbserver.mysql.database.azure.com',
+        'PORT': '3306',
 
     }
 }
@@ -138,4 +140,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+DEFAULT_FILE_STORAGE = 'backend.custom_azure.AzureMediaStorage'
+STATICFILES_STORAGE = 'backend.custom_azure.AzureStaticStorage'
+
+STATIC_LOCATION = "static"
+MEDIA_LOCATION = "media"
+
+AZURE_ACCOUNT_NAME = "moneylifestorage"
+AZURE_CUSTOM_DOMAIN = f'moneylifestorage.blob.core.windows.net'
+STATIC_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
+
