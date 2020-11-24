@@ -20,7 +20,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from monyLifeApp import scripts
 
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
@@ -34,7 +33,6 @@ class UserViewSet(viewsets.ModelViewSet):
         if user == None:
             return JsonResponse({'mensaje': "Usuario o contrasena incorrecta"}, safe = False)
         return JsonResponse({'id': user.id, 'username': user.username}, safe = False)
-
 
 ###################################################################
 #LOGICA DE EVENTOS
@@ -245,15 +243,15 @@ class PrestamoViewSet(viewsets.ModelViewSet):
         turno = Turnos.objects.filter(User=user).first()
         prestamo = Prestamo.objects.filter(id = jsonPrestamo["PrestamoID"], User = user).first()
         
-        if prestamo.SaldoAbsoluto < jsonPrestamo["Amortizacion"]:
+        if prestamo.SaldoAbsoluto < Decimal(jsonPrestamo["Amortizacion"]):
             return JsonResponse({"mensaje": "El saldo absoluto es menos que la amortización"}, safe=False)
         
         #print("Dinero de turno = ", turno.DineroEfectivo)
 
-        if turno.DineroEfectivo <= jsonPrestamo["Amortizacion"]:
+        if turno.DineroEfectivo <= Decimal(jsonPrestamo["Amortizacion"]):
             return JsonResponse({"mensaje": "No tienes la cantidad requerida para esta acción"}, safe=False)
 
-        if jsonPrestamo["Amortizacion"] <= 0:
+        if Decimal(jsonPrestamo["Amortizacion"]) <= 0:
             return JsonResponse({"mensaje": "Cantidad no valida"}, safe=False)
 
         prestamo.AbonoCapital = Decimal(jsonPrestamo["Amortizacion"]) + prestamo.AbonoCapital
@@ -347,17 +345,18 @@ class InversionViewSet(viewsets.ModelViewSet):
         jsonInversion = request.data
         user = User.objects.filter(id = jsonInversion['UserID']).first()
 
-        inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user.id)
+        #inversionesAfecta = Afecta_user.objects.filter(Afecta__startswith = 'Inversion', User = user.id)
         inversionPregunta = InversionPregunta.objects.filter(User = user.id)
 
         inversiones = []
 
+        """
         for afecta in inversionesAfecta:
             periodo = Periodo.objects.filter(Turnos=afecta.TurnosEsperar).first()
-            inversiones.append({'id':afecta.id, 'TipoInversion': 'FlujoEfectivo', 'Cantidad':afecta.Cantidad, 'Periodo': periodo.TipoPeriodo})
-
+            inversiones.append({'id':afecta.id, 'TipoInversion': 'FlujoEfectivo', 'Descripcion':afecta.Descripcion, 'Cantidad':afecta.Cantidad, 'Periodo': periodo.TipoPeriodo})
+        """
         for inverPregunta in inversionPregunta:
-            inversiones.append({'id':inverPregunta.id, 'TipoInversion':'GananciaCapital', 'Inicio':inverPregunta.SaldoInicial, 'Actual':inverPregunta.SaldoActual})
+            inversiones.append({'id':inverPregunta.id, 'TipoInversion':'GananciaCapital', 'Descripcion':inverPregunta.Descripcion, 'Inicio':inverPregunta.SaldoInicial, 'Actual':inverPregunta.SaldoActual})
 
         return JsonResponse(inversiones, safe=False)
     
@@ -477,16 +476,17 @@ class PortafolioViewSet(viewsets.ModelViewSet):
         portafolio = {'Egresos':[], 'Ingresos':[]}
 
         portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":"Sueldo","Cantidad":turno.Sueldo, "Periodo":"Mensual"})
+        portafolio['Egresos'].append({"Tipo":"Egreso", "Nombre":"Gastos Personales", "Cantidad":8000, "Periodo":"Mensual"})
 
         for prestamo in prestamos:
             nombrePrestamo = TipoPrestamo.objects.filter(idPrestamo = prestamo.idPrestamo.id).first()
             nombre = "Préstamo " + str(nombrePrestamo.TipoPrestamo)
             portafolio['Egresos'].append({"Tipo":"Egreso", "Nombre":nombre, "Cantidad":prestamo.Mensualidad, "Periodo":"Mensual"})
-
+        """
         for inversion in inversiones:
             compania = TipoInversiones.objects.filter(id=inversion.TipoInversion.id).first()
             portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":compania.Inversion, "Cantidad":inversion.SaldoActual, "Periodo":"Activo"})
-
+        """
         for ingreso in ingresos:
             periodo = Periodo.objects.filter(Turnos=ingreso.TurnosEsperar).first()
             portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":ingreso.Descripcion, "Cantidad":ingreso.Cantidad, "Periodo":periodo.TipoPeriodo})
@@ -495,14 +495,15 @@ class PortafolioViewSet(viewsets.ModelViewSet):
             periodo = Periodo.objects.filter(Turnos=egreso.TurnosEsperar).first()
             portafolio['Egresos'].append({"Tipo":"Egreso", "Nombre":egreso.Descripcion, "Cantidad":egreso.Cantidad, "Periodo":periodo.TipoPeriodo})
 
+        
         for invercionAfe in inversionesAfecta:
             periodo = Periodo.objects.filter(Turnos=invercionAfe.TurnosEsperar).first()
             portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":invercionAfe.Descripcion, "Cantidad":invercionAfe.Cantidad, "Periodo":periodo.TipoPeriodo})
-            
+        """
         for inversionPreg in inversionPregunta:
             tipoInversion = TipoPregunta.objects.filter(id=inversionPreg.TipoInversion.id).first()
             portafolio['Ingresos'].append({"Tipo":"Ingreso", "Nombre":tipoInversion.TipoPregunta, "Cantidad":inversionPreg.SaldoActual, "Periodo":"Activo"})
-        
+        """
         return JsonResponse(portafolio, safe=False)
 
     
