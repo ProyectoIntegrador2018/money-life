@@ -5,8 +5,8 @@
 export const environment = {
   production: false,
   // apiEndPoint:'',
-  apiEndPoint: 'https://614770b995f3.ngrok.io/' // Conexión de back test
-  // apiEndPoint: 'https://moneylifev1.azurewebsites.net/' // Conexión de back productivo
+  // apiEndPoint: 'https://614770b995f3.ngrok.io/' // Conexión de back test
+  apiEndPoint: 'https://moneylifev1.azurewebsites.net/' // Conexión de back productivo
   // apiEndPoint: 'http://localhost:8000/' // Conexión de back test local
 };
 
