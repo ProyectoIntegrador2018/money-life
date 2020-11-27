@@ -28,7 +28,7 @@ El juego comenzará con una persona estudiante de aproximadamente 18 años y se 
 
 | Nombre                          | Email                | Rol                                                                               |
 | ------------------------------ | -------------------- | ---------------------------------------------------------------------------------- |
-| Rubén Manuel Aguilar Marroquín | ruben.aguilar@tec.mx | Profesor de finanzas ITESM Campus Mty. |
+| Rubén Cantu Damas | ruben.aguilar@tec.mx | Profesor de finanzas ITESM Campus Mty. |
 
 ### Ambiente URLS
 
