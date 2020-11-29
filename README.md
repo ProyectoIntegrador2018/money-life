@@ -37,6 +37,12 @@ https://moneylifev1.azurewebsites.net
 Frontend
 https://moneylifev2.azurewebsites.net
 
+Base de Datos
+moneylifedbserver.mysql.database.azure.com
+
+Servicio de Almacenamiento
+https://moneylifestorage.blob.core.windows.net/
+
 ### Miembros del equipo
 
 Versión 1.0
