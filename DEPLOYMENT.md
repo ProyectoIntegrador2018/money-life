@@ -1,6 +1,6 @@
 # Deployment
 El despliegue completo de la aplicacion se realiza por separado backend y frontend con el uso de diferentes herramientas como vscode, github, docker, docker hub y azure. A continuacion se muestra el diagrama de deployment de la aplicacion:
-![alt text](https://github.com/ProyectoIntegrador2018/money-life/blob/actualizacionarchivos/DeploymentDiagram.png)
+![alt text](https://github.com/ProyectoIntegrador2018/money-life/blob/actualizacionarchivos/DeploymentDiagramFinal.png)
 
 ## Como hacer deployment manual de los componentes. 
 1.	Instalar VScode e instalar las siguientes extensiones, Azure Tools, Docker (tambien instalarlo en su equipo) y crear cuenta en docker hub.
