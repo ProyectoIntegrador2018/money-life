@@ -5,13 +5,13 @@ El despliegue completo de la aplicacion se realiza por separado backend y fronte
 ## Como hacer deployment manual de los componentes. 
 1.	Instalar VScode e instalar las siguientes extensiones, Azure Tools, Docker (tambien instalarlo en su equipo) y crear cuenta en docker hub.
 1.	Instalar Nodejs para poder instalar angular:
-    * Mediante el siguiente link: https://nodejs.org/en/download/"
+    * Mediante el siguiente link: https://nodejs.org/en/download/
     * Al terminar la instalacion correr el siguiente comando en terminal:
     * npm install -g @angular/cli
 1.	Instalar python 3.8:
-    * Mediante el siguiente link: https://www.python.org/downloads/"
+    * Mediante el siguiente link: https://www.python.org/downloads/
 1.	Instalar Docker:
-    * Mediante el siguiente link: https://www.docker.com/products/docker-desktop"
+    * Mediante el siguiente link: https://www.docker.com/products/docker-desktop
 1.  Instalar MySQL:
     * Mediante el siguiente link: https://dev.mysql.com/downloads/installer/
     * Instalar (opcional) MySQL Workbench con el mismo instalador del paso pasado.
