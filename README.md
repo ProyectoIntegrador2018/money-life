@@ -31,17 +31,13 @@ El juego comenzará con una persona estudiante de aproximadamente 18 años y se 
 | Rubén Cantu Damas | ruben.aguilar@tec.mx | Profesor de finanzas ITESM Campus Mty. |
 
 ### Ambiente URLS
-Backend
-https://moneylifev1.azurewebsites.net
+Backend: https://moneylifev1.azurewebsites.net
 
-Frontend
-https://moneylifev2.azurewebsites.net
+Frontend: https://moneylifev2.azurewebsites.net
 
-Base de Datos
-moneylifedbserver.mysql.database.azure.com
+Base de Datos: moneylifedbserver.mysql.database.azure.com
 
-Servicio de Almacenamiento
-https://moneylifestorage.blob.core.windows.net/
+Servicio de Almacenamiento: https://moneylifestorage.blob.core.windows.net/
 
 ### Miembros del equipo
 
