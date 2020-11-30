@@ -6,7 +6,7 @@ Money Life (Sitio Web)
 
 Este proyecto es un videojuego de finanzas personales, el cual consiste en simular de una forma interactiva la vida de una persona con base en las decisiones económicas que se presenten, tratando de imitar las oportunidades que comúnmente se presentan en la vida cotidiana de una persona de nivel socioeconómico medio. El juego tendrá como variables eventos de tipio micro y macro, aparte de toma de decisiones en forma de inversiones, gastos personales y modificaciones de tu estado económico actual, todas estas variables tendrán un efecto tanto positivo como negativo en tu ganancias y deudas diarias, aparte de evaluar el nivel de comodidad o felicidad con el cual cuenta tu personaje con las decisiones y eventos previos.
 
-El juego comenzará con una persona estudiante de aproximadamente 18 años y se ira incrementando la edad con forme pase los turnos, cada turno será lo equivalente a un periodo de 2 semanas o 1 mes, y en cada uno de estos sucederán los eventos y las decisiones previamente dichas. El juego terminara cuanto tus decisiones te hayan llevado a tener un estilo de vida feliz y económicamente autosustentable, o a los 65 años, dando el juego como perdido en este punto.
+El juego comenzará con una persona estudiante de aproximadamente 18 años y se ira incrementando la edad con forme pase los turnos, cada turno será lo equivalente a un periodo de 2 semanas o 1 mes, y en cada uno de estos sucederán los eventos y las decisiones previamente dichas.
 
 
 ## Tabla de contenidos
@@ -31,17 +31,22 @@ El juego comenzará con una persona estudiante de aproximadamente 18 años y se 
 | Rubén Cantu Damas | ruben.aguilar@tec.mx | Profesor de finanzas ITESM Campus Mty. |
 
 ### Ambiente URLS
+Backend: https://moneylifev1.azurewebsites.net
 
-[localhost](http://localhost:3000/) 
+Frontend: https://moneylifev2.azurewebsites.net
+
+Base de Datos: moneylifedbserver.mysql.database.azure.com
+
+Servicio de Almacenamiento: https://moneylifestorage.blob.core.windows.net/
 
 ### Miembros del equipo
 
 Versión 1.0
-| Nombre                              | Email                   | Rol                              |
-| --------------------------------- | ----------------------- | --------------------------------- |
-|Rodrigo Valencia Maciel            | A00818256@itesm.mx      | Desarrollador                     |
-|Rodrigo Esparza Giacomelli         | A00819564@itesm.mx      | Desarrollador                     |
-|Christopher David Parga Jaramillo  | A00818942@itesm.mx      | Desarrollador                     |
+| Nombre                              | Email                   | Rol                                             |
+| --------------------------------- | ----------------------- | ------------------------------------------------- |
+|Rodrigo Valencia Maciel            | A00818256@itesm.mx      | Desarrollador - Product Owner                     |
+|Rodrigo Esparza Giacomelli         | A00819564@itesm.mx      | Desarrollador - Scrum Master                      |
+|Christopher David Parga Jaramillo  | A00818942@itesm.mx      | Desarrollador - Administrador de Configuracion    |
 
 
 ### Tecnológia utilizada
@@ -51,7 +56,7 @@ Versión 1.0
 | --------------- | ------------ |
 | Angular CLI     | 10.1.0       |
 | Django          | 3.1.1        |
-| Pyhton          | 3.8.3        |
+| Python          | 3.8.3        |
 | mySQL           | 8.0.9        |
 
 
@@ -64,6 +69,8 @@ Debes solicitar acceso para acceder a estos recursos
 [Trello](https://trello.com/b/qKyp3rHZ/personal-development)
 
 [Drive](https://drive.google.com/drive/folders/1tLua2-ePArqoOsd-bFwI_NKb_JG6Xsz8?usp=sharing)
+
+[Docker Hub] (https://hub.docker.com/repository/docker/parga97/back_django_app)
 
 ## Desarrollo
 
