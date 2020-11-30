@@ -70,7 +70,7 @@ Debes solicitar acceso para acceder a estos recursos
 
 [Drive](https://drive.google.com/drive/folders/1tLua2-ePArqoOsd-bFwI_NKb_JG6Xsz8?usp=sharing)
 
-[Docker Hub] (https://hub.docker.com/repository/docker/parga97/back_django_app)
+[Docker Hub](https://hub.docker.com/repository/docker/parga97/back_django_app)
 
 ## Desarrollo
 
